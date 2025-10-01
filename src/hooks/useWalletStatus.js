@@ -15,12 +15,12 @@ export function WalletStatusProvider({ children }) {
   // Always use real wallet - no dev wallet
   const isDev = false;
 
-  const { 
+  const {
     address: account,
     isConnected: connected,
     chain: network
   } = useAccount();
-  
+
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
 
@@ -54,15 +54,15 @@ export function WalletStatusProvider({ children }) {
 
         return newState
           ? {
-              isConnected: true,
-              address: '0x1234...dev',
-              chain: { id: 'arbitrum_testnet', name: 'Arbitrum Sepolia' },
-            }
+            isConnected: true,
+            address: '0x1234...dev',
+            chain: { id: 'arbitrum_testnet', name: 'Arbitrum Sepolia' },
+          }
           : {
-              isConnected: false,
-              address: null,
-              chain: null,
-            };
+            isConnected: false,
+            address: null,
+            chain: null,
+          };
       });
     };
 
