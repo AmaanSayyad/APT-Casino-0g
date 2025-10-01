@@ -134,7 +134,7 @@ export function WalletStatusProvider({ children }) {
   });
 
   useEffect(() => {
-    console.log('🔌 Arbitrum Wallet connection changed:');
+    console.log('🔌 Wallet connection changed:');
     console.log('=== CURRENT STATUS ===');
     console.log('Connected:', currentStatus.isConnected);
     console.log('Address:', currentStatus.address);

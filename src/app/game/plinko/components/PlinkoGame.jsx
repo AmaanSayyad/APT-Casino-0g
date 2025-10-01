@@ -481,7 +481,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
         console.log('Bet amount (ref):', betAmountRef.current);
         console.log('Multiplier:', multiplier, '(bin index:', binIndex, ')');
         console.log('Multiplier value:', multiplierValue);
-        console.log('Reward calculated:', reward, 'ETH');
+        console.log('Reward calculated:', reward, 'OG');
         console.log('==================');
         
         // Add reward to current balance (bet amount already deducted when ball was spawned)
@@ -523,7 +523,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
               sessionId: `plinko_${Date.now()}`,
               gameType: 'PLINKO',
               requestId: `plinko_request_${Date.now()}`,
-              valueEth: 0
+              valueOg: 0
             })
           }).catch(() => {});
         } catch {}
@@ -586,7 +586,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
         betAmount: latestBetAmount,
         balanceInETH: currentBalance.toFixed(9)
       });
-              alert(`Insufficient balance! You have ${currentBalance.toFixed(9)} ETH but need ${latestBetAmount} ETH`);
+              alert(`Insufficient balance! You have ${currentBalance.toFixed(9)} OG but need ${latestBetAmount} OG`);
       return;
     }
     
@@ -770,7 +770,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
               {betHistory.slice(0, 5).map((bet, index) => (
                 <div key={index} className="w-16 h-16 bg-[#2A0025] border border-[#333947] rounded-lg flex flex-col items-center justify-center p-1">
                   <span className="w-full text-center leading-tight text-xs font-bold text-white">{bet.multiplier}</span>
-                  <span className="w-full text-center leading-tight text-[10px] text-green-400">+{bet.payout} ETH</span>
+                  <span className="w-full text-center leading-tight text-[10px] text-green-400">+{bet.payout} OG</span>
                 </div>
               ))}
               {Array.from({ length: Math.max(0, 5 - Math.min(5, betHistory.length)) }).map((_, index) => (
@@ -828,7 +828,7 @@ const PlinkoGame = forwardRef(({ rowCount = 16, riskLevel = "Medium", onRowChang
           <div className="text-xs text-gray-400">Best Multiplier</div>
         </div>
         <div className="text-center">
-                          <div className="text-2xl font-bold text-white">{totalWon.toFixed(5)} ETH</div>
+                          <div className="text-2xl font-bold text-white">{totalWon.toFixed(5)} OG</div>
           <div className="text-xs text-gray-400">Total Won</div>
         </div>
       </div>

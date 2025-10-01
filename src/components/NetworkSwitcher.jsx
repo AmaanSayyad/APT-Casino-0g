@@ -5,10 +5,10 @@ import { FaExchangeAlt } from 'react-icons/fa';
 const SUPPORTED_NETWORKS = {
   ARBITRUM_SEPOLIA: {
     chainId: '0x66eee', // 421614 in decimal
-    chainName: 'Arbitrum Sepolia',
+    chainName: '0G Network',
     nativeCurrency: {
-      name: 'Arbitrum',
-      symbol: 'ETH',
+      name: '0G Network',
+      symbol: 'OG',
       decimals: 18
     },
     rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
@@ -54,7 +54,7 @@ const NetworkSwitcher = () => {
       const currentChainId = chainId.toLowerCase();
 
       if (currentChainId === arbitrumSepoliaChainId) {
-        console.log('Setting network to Arbitrum Sepolia');
+        console.log('Setting network to 0G Network');
         setCurrentNetwork('ARBITRUM_SEPOLIA');
       } else {
         console.log('Unsupported network detected:', chainId);

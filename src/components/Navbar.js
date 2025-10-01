@@ -85,8 +85,8 @@ const MOCK_SEARCH_RESULTS = {
     { id: 'game4', name: 'Plinko', path: '/game/plinko', type: 'Popular' },
   ],
   tournaments: [
-    { id: 'tournament1', name: 'High Roller Tournament', path: '/tournaments/high-roller', prize: '10,000 ETH' },
-    { id: 'tournament2', name: 'Weekend Battle', path: '/tournaments/weekend-battle', prize: '5,000 ETH' },
+    { id: 'tournament1', name: 'High Roller Tournament', path: '/tournaments/high-roller', prize: '10,000 OG' },
+    { id: 'tournament2', name: 'Weekend Battle', path: '/tournaments/weekend-battle', prize: '5,000 OG' },
   ],
   pages: [
     { id: 'page1', name: 'Bank', path: '/bank', description: 'Deposit and withdraw funds' },
@@ -166,7 +166,7 @@ export default function Navbar() {
     {
       id: '1',
       title: 'Balance Updated',
-      message: 'Your ETH balance has been updated',
+      message: 'Your OG balance has been updated',
       isRead: false,
       time: '2 min ago'
     },
@@ -346,8 +346,8 @@ export default function Navbar() {
 
     try {
       setIsWithdrawing(true);
-      const balanceInEth = parseFloat(userBalance || '0');
-      if (balanceInEth <= 0) {
+      const balanceInOg = parseFloat(userBalance || '0');
+      if (balanceInOg <= 0) {
         notification.error('No balance to withdraw');
         return;
       }
@@ -364,7 +364,7 @@ export default function Navbar() {
         },
         body: JSON.stringify({
           userAddress: address,
-          amount: balanceInEth
+          amount: balanceInOg
         })
       });
 
@@ -386,7 +386,7 @@ export default function Navbar() {
       const txHash = result?.transactionHash || 'Unknown';
       const txDisplay = txHash !== 'Unknown' ? `${txHash.slice(0, 8)}...` : 'Pending';
       
-      notification.success(`Withdrawal transaction sent! ${balanceInEth.toFixed(5)} ETH will be transferred. TX: ${txDisplay}`);
+      notification.success(`Withdrawal transaction sent! ${balanceInOg.toFixed(5)} OG will be transferred. TX: ${txDisplay}`);
       
       // Close the modal
       setShowBalanceModal(false);
@@ -425,17 +425,17 @@ export default function Navbar() {
     
     // Check deposit limits
     if (amount < TREASURY_CONFIG.LIMITS.MIN_DEPOSIT) {
-      notification.error(`Minimum deposit amount is ${TREASURY_CONFIG.LIMITS.MIN_DEPOSIT} ETH`);
+      notification.error(`Minimum deposit amount is ${TREASURY_CONFIG.LIMITS.MIN_DEPOSIT} OG`);
       return;
     }
     
     if (amount > TREASURY_CONFIG.LIMITS.MAX_DEPOSIT) {
-      notification.error(`Maximum deposit amount is ${TREASURY_CONFIG.LIMITS.MAX_DEPOSIT} ETH`);
+      notification.error(`Maximum deposit amount is ${TREASURY_CONFIG.LIMITS.MAX_DEPOSIT} OG`);
       return;
     }
 
     setIsDepositing(true);
-    console.log('🚀 Starting deposit process for:', amount, 'ETH');
+    console.log('🚀 Starting deposit process for:', amount, 'OG');
     try {
       console.log('Depositing to house balance:', { address: address, amount });
       
@@ -448,38 +448,62 @@ export default function Navbar() {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const userAccount = accounts[0];
       
-      // Check if user is on Sepolia network
+      // Check if user is on 0G Galileo network
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
       const expectedChainId = TREASURY_CONFIG.NETWORK.CHAIN_ID;
       
+      console.log('🔍 Current chain ID:', chainId);
+      console.log('🔍 Expected chain ID:', expectedChainId);
+      
       if (chainId !== expectedChainId) {
-        // Try to switch to Sepolia
+        console.log('🔄 Need to switch network...');
+        // Try to switch to 0G Galileo
         try {
+          console.log('🔄 Attempting to switch to 0G Galileo...');
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: expectedChainId }],
           });
+          console.log('✅ Successfully switched to 0G Galileo');
         } catch (switchError) {
-          // If Sepolia is not added, add it
+          console.log('⚠️ Switch error:', switchError);
+          // If 0G Galileo is not added, add it
           if (switchError.code === 4902) {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: expectedChainId,
-                chainName: TREASURY_CONFIG.NETWORK.CHAIN_NAME,
-                nativeCurrency: {
-                  name: 'Sepolia ETH',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: [TREASURY_CONFIG.NETWORK.RPC_URL],
-                blockExplorerUrls: [TREASURY_CONFIG.NETWORK.EXPLORER_URL]
-              }]
-            });
+            console.log('🔧 Network not found, adding 0G Galileo...');
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: expectedChainId,
+                  chainName: TREASURY_CONFIG.NETWORK.CHAIN_NAME,
+                  nativeCurrency: {
+                    name: 'OG',
+                    symbol: 'OG',
+                    decimals: 18
+                  },
+                  rpcUrls: [TREASURY_CONFIG.NETWORK.RPC_URL],
+                  blockExplorerUrls: [TREASURY_CONFIG.NETWORK.EXPLORER_URL]
+                }]
+              });
+              console.log('✅ Successfully added 0G Galileo network');
+              
+              // Try to switch again after adding
+              await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: expectedChainId }],
+              });
+              console.log('✅ Successfully switched to 0G Galileo after adding');
+            } catch (addError) {
+              console.error('❌ Failed to add network:', addError);
+              throw new Error(`Failed to add 0G Galileo network: ${addError.message}`);
+            }
           } else {
-            throw new Error(`Please switch to ${TREASURY_CONFIG.NETWORK.CHAIN_NAME} network`);
+            console.error('❌ Switch error:', switchError);
+            throw new Error(`Please switch to ${TREASURY_CONFIG.NETWORK.CHAIN_NAME} network. Error: ${switchError.message}`);
           }
         }
+      } else {
+        console.log('✅ Already on correct network');
       }
       
       // Casino treasury address from config
@@ -537,7 +561,7 @@ export default function Navbar() {
         // Don't fail the deposit if API call fails - balance is already updated
       }
       
-      notification.success(`Successfully deposited ${amount} ETH to casino treasury! TX: ${txHash.slice(0, 10)}...`);
+      notification.success(`Successfully deposited ${amount} OG to casino treasury! TX: ${txHash.slice(0, 10)}...`);
       
       setDepositAmount("");
       
@@ -957,7 +981,7 @@ export default function Navbar() {
                   <div className="flex items-center space-x-2">
                     <span className="text-xs text-gray-300">Balance:</span>
                     <span className="text-sm text-green-300 font-medium">
-                      {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} ETH`}
+                      {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} OG`}
                     </span>
                     <button
                       onClick={() => setShowBalanceModal(true)}
@@ -1046,7 +1070,7 @@ export default function Navbar() {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-gray-300">House Balance:</span>
                                       <span className="text-sm text-green-300 font-medium">
-                      {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} ETH`}
+                      {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} OG`}
                     </span>
                     </div>
                     <button
@@ -1103,13 +1127,13 @@ export default function Navbar() {
               <div className="mb-4 p-3 bg-gradient-to-r from-green-900/20 to-green-800/10 rounded-lg border border-green-800/30">
                 <span className="text-sm text-gray-300">Current Balance:</span>
                 <div className="text-lg text-green-300 font-bold">
-                  {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} ETH`}
+                  {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} OG`}
                 </div>
               </div>
               
               {/* Deposit Section */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-white mb-2">Deposit ETH to Casino Treasury</h4>
+                <h4 className="text-sm font-medium text-white mb-2">Deposit OG to Casino Treasury</h4>
                 <div className="text-xs text-gray-400 mb-2">
                   Treasury: {TREASURY_CONFIG.ADDRESS.slice(0, 10)}...{TREASURY_CONFIG.ADDRESS.slice(-8)}
                 </div>
@@ -1118,7 +1142,7 @@ export default function Navbar() {
                     type="number"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
-                    placeholder="Enter ETH amount"
+                    placeholder="Enter OG amount"
                     className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-600/50 rounded text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/25"
                     min="0"
                     step="0.00000001"
@@ -1145,7 +1169,7 @@ export default function Navbar() {
                   </button>
                 </div>
                 <p className="text-xs text-gray-400 mt-1">
-                  Transfer ETH from your wallet to house balance for gaming
+                  Transfer OG from your wallet to house balance for gaming
                 </p>
                 {/* Quick Deposit Buttons */}
                 <div className="flex gap-1 mt-2">
@@ -1156,7 +1180,7 @@ export default function Navbar() {
                       className="flex-1 px-2 py-1 text-xs bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 rounded transition-colors"
                       disabled={isDepositing}
                     >
-                      {amount} ETH
+                      {amount} OG
                     </button>
                   ))}
                 </div>
@@ -1165,7 +1189,7 @@ export default function Navbar() {
 
               {/* Withdraw Section */}
               <div className="mb-4">
-                <h4 className="text-sm font-medium text-white mb-2">Withdraw All ETH</h4>
+                <h4 className="text-sm font-medium text-white mb-2">Withdraw All OG</h4>
                 <button
                   onClick={handleWithdraw}
                   disabled={!isConnected || parseFloat(userBalance || '0') <= 0 || isWithdrawing}
@@ -1177,7 +1201,7 @@ export default function Navbar() {
                       Processing...
                     </>
                   ) : isConnected ? (
-                    parseFloat(userBalance || '0') > 0 ? 'Withdraw All ETH' : 'No Balance'
+                    parseFloat(userBalance || '0') > 0 ? 'Withdraw All OG' : 'No Balance'
                   ) : 'Connect Wallet'}
                   {isConnected && parseFloat(userBalance || '0') > 0 && !isWithdrawing && (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1187,7 +1211,7 @@ export default function Navbar() {
                 </button>
                 {isConnected && parseFloat(userBalance || '0') > 0 && (
                   <p className="text-xs text-gray-400 mt-1 text-center">
-                    Withdraw {parseFloat(userBalance || '0').toFixed(5)} ETH to your wallet
+                    Withdraw {parseFloat(userBalance || '0').toFixed(5)} OG to your wallet
                   </p>
                 )}
               </div>

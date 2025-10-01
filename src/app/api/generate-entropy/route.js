@@ -31,7 +31,7 @@ export async function POST(request) {
     let fee;
     try {
       fee = await contract.getFeeV2(200000); // 200k gas limit
-      console.log('💰 Fee:', ethers.formatEther(fee), 'ETH');
+      console.log('💰 Fee:', ethers.formatEther(fee), 'OG');
     } catch (error) {
       console.warn('⚠️ Could not get fee, using default:', error.message);
       fee = ethers.parseEther('0.001'); // Default fee

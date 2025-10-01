@@ -173,7 +173,7 @@ const WheelPayouts = () => {
                 Bet Amount
               </Typography>
               <Typography variant="h6" color="white" fontWeight="bold">
-                100 ETH
+                100 OG
               </Typography>
             </Box>
             
@@ -215,7 +215,7 @@ const WheelPayouts = () => {
                 Payout
               </Typography>
               <Typography variant="h6" color="#14D854" fontWeight="bold">
-                500 ETH
+                500 OG
               </Typography>
             </Box>
           </Box>
@@ -285,12 +285,12 @@ const WheelPayouts = () => {
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <GiPayMoney color="#FFA500" />
-                          <Typography>{example.bet} ETH</Typography>
+                          <Typography>{example.bet} OG</Typography>
                         </Box>
                       </TableCell>
                       <TableCell>{example.multiplier}</TableCell>
-                      <TableCell sx={{ color: '#FFA500', fontWeight: 'medium' }}>{example.payout} ETH</TableCell>
-                      <TableCell sx={{ color: '#14D854', fontWeight: 'medium' }}>+{example.profit} ETH</TableCell>
+                      <TableCell sx={{ color: '#FFA500', fontWeight: 'medium' }}>{example.payout} OG</TableCell>
+                      <TableCell sx={{ color: '#14D854', fontWeight: 'medium' }}>+{example.profit} OG</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -331,7 +331,7 @@ const WheelPayouts = () => {
             Maximum Payout
           </Typography>
           <Typography variant="body2" color="rgba(255,255,255,0.7)">
-            The maximum payout per spin is capped at 1,000,000 ETH. This means that regardless of your bet amount and the multiplier, you cannot win more than 1,000,000 ETH in a single spin.
+            The maximum payout per spin is capped at 1,000,000 OG. This means that regardless of your bet amount and the multiplier, you cannot win more than 1,000,000 OG in a single spin.
           </Typography>
         </Box>
       </Box>

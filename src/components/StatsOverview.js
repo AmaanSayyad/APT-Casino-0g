@@ -42,11 +42,11 @@ const StatsOverview = () => {
                 <div className="h-6 w-20 bg-white/10 animate-pulse rounded"></div>
               ) : (
                 <span className="text-2xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-red-magic to-blue-magic">
-                  {formatNumber(stats.totalETHPool)}
+                  {formatNumber(stats.totalOG pool)}
                 </span>
               )}
             </div>
-            <p className="text-xs uppercase mt-1 text-white/70">Total ETH Pool</p>
+            <p className="text-xs uppercase mt-1 text-white/70">Total OG Pool</p>
           </div>
           
           <div className="flex flex-col items-center">
@@ -59,7 +59,7 @@ const StatsOverview = () => {
                 </span>
               )}
             </div>
-            <p className="text-xs uppercase mt-1 text-white/70">ETH APY</p>
+            <p className="text-xs uppercase mt-1 text-white/70">OG APY</p>
           </div>
           
           <div className="flex flex-col items-center">
@@ -72,7 +72,7 @@ const StatsOverview = () => {
                 </span>
               )}
             </div>
-            <p className="text-xs uppercase mt-1 text-white/70">ETH Price</p>
+            <p className="text-xs uppercase mt-1 text-white/70">OG Price</p>
           </div>
           
           <div className="flex flex-col items-center">

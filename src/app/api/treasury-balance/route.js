@@ -23,7 +23,7 @@ export async function GET() {
     
     // Get treasury balance
     const balance = await provider.getBalance(treasuryWallet.address);
-    const balanceInEth = ethers.formatEther(balance);
+    const balanceInOg = ethers.formatEther(balance);
     
     // Get entropy contract address
     const entropyContractAddress = PYTH_ENTROPY_CONFIG.getEntropyContract(network);
@@ -32,7 +32,7 @@ export async function GET() {
       success: true,
       treasury: {
         address: treasuryWallet.address,
-        balance: balanceInEth,
+        balance: balanceInOg,
         balanceWei: balance.toString()
       },
       network: {
@@ -42,7 +42,7 @@ export async function GET() {
       },
       entropy: {
         contractAddress: entropyContractAddress,
-        requiredFee: "0.001" // ETH
+        requiredFee: "0.001" // OG
       }
     });
     

@@ -117,13 +117,13 @@ class YellowNetworkService {
         console.log('🟡 YELLOW NETWORK: Initializing ERC-7824 Nitrolite client...');
         console.log('🔗 Connecting to Clearnode Testnet:', process.env.CLEARNODE_TESTNET_WS_URL || CLEARNODE_TESTNET_CONFIG.clearNodeUrl);
 
-        // Create Arbitrum Sepolia client for on-chain operations
+        // Create 0G Network client for on-chain operations
         const arbitrumClient = createPublicClient({
           chain: arbitrumSepolia,
           transport: http(process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc')
         });
 
-        console.log('🔗 Primary Network: Arbitrum Sepolia (Chain ID: 421614)');
+        console.log('🔗 Primary Network: 0G Network (Chain ID: 421614)');
         console.log('🟡 Yellow Network: Clearnode Testnet for state channels');
 
         // Get wallet client from window.ethereum if available
@@ -268,7 +268,7 @@ class YellowNetworkService {
       this.connectionRetries = 0;
       
       console.log('✅ YELLOW NETWORK: ERC-7824 connection established');
-      console.log('🔗 State channels active on Arbitrum Sepolia settlement layer');
+      console.log('🔗 State channels active on 0G Network settlement layer');
       console.log('⚡ Gasless transactions enabled via state channels');
       
       return true;

@@ -166,7 +166,7 @@ const WheelHistory = ({ gameHistory = [] }) => {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
               }}>
-                {totalVolume.toFixed(5)} ETH
+                {totalVolume.toFixed(5)} OG
               </Typography>
               <Box 
                 sx={{ 
@@ -202,7 +202,7 @@ const WheelHistory = ({ gameHistory = [] }) => {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
               }}>
-                {biggestWin.toFixed(5)} ETH
+                {biggestWin.toFixed(5)} OG
               </Typography>
               <FaTrophy color="#FFA500" />
             </Box>
@@ -522,7 +522,7 @@ const WheelHistory = ({ gameHistory = [] }) => {
                           whiteSpace: 'nowrap'
                         }}
                       >
-                            {item.betAmount} ETH
+                            {item.betAmount} OG
                       </Typography>
                       <Image src="/coin.png" width={16} height={16} alt="coin" />
                     </Box>
@@ -553,7 +553,7 @@ const WheelHistory = ({ gameHistory = [] }) => {
                           whiteSpace: 'nowrap'
                         }}
                       >
-                            {item.payout} ETH
+                            {item.payout} OG
                       </Typography>
                       <Image src="/coin.png" width={16} height={16} alt="coin" />
                     </Box>

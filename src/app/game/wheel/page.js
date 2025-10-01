@@ -135,7 +135,7 @@ export default function Home() {
             sessionId: entropyResult.entropyProof?.requestId || `wheel_${Date.now()}`,
             gameType: 'WHEEL',
             channelId: entropyResult.entropyProof?.requestId || 'entropy_channel',
-            valueEth: 0
+            valueOg: 0
           })
         })
           .then(async (r) => {
@@ -152,11 +152,11 @@ export default function Home() {
     }
   };
 
-    // Check Redux balance (balance is already in ETH)
+    // Check Redux balance (balance is already in OG)
     const currentBalance = parseFloat(userBalance || '0');
     
     if (currentBalance < betAmount) {
-      alert(`Insufficient balance. You have ${currentBalance.toFixed(5)} ETH but need ${betAmount} ETH`);
+      alert(`Insufficient balance. You have ${currentBalance.toFixed(5)} OG but need ${betAmount} OG`);
       return;
     }
 
@@ -173,7 +173,7 @@ export default function Home() {
       const newBalance = (parseFloat(userBalance || '0') - betAmount).toString();
       dispatch(setBalance(newBalance));
       
-      console.log('Balance deducted. New balance:', parseFloat(newBalance).toFixed(5), 'ETH');
+      console.log('Balance deducted. New balance:', parseFloat(newBalance).toFixed(5), 'OG');
       
       // Set up callback to handle wheel animation completion
       window.wheelBetCallback = async (landedMultiplier) => {
@@ -237,7 +237,7 @@ export default function Home() {
           
           // Show result and update balance immediately
           if (actualMultiplier > 0) {
-            notification.success(`Congratulations! ${betAmount} ETH × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(5)} ETH won!`);
+            notification.success(`Congratulations! ${betAmount} OG × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(5)} OG won!`);
             
             // Update balance with winnings
             const currentBalance = parseFloat(userBalance || '0');
@@ -329,7 +329,7 @@ export default function Home() {
       });
       
       if (currentBalance < currentBet) {
-        alert(`Insufficient balance for bet ${i + 1}. Need ${currentBet.toFixed(5)} ETH but have ${currentBalance.toFixed(5)} ETH`);
+        alert(`Insufficient balance for bet ${i + 1}. Need ${currentBet.toFixed(5)} OG but have ${currentBalance.toFixed(5)} OG`);
         break;
       }
 
@@ -432,7 +432,7 @@ export default function Home() {
       
       // Show notification for win
       if (actualMultiplier > 0) {
-        notification.success(`Congratulations! ${currentBet} ETH × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(8)} ETH won!`);
+        notification.success(`Congratulations! ${currentBet} OG × ${actualMultiplier.toFixed(2)} = ${winAmount.toFixed(8)} OG won!`);
       }
 
       // Store history entry
@@ -504,8 +504,8 @@ export default function Home() {
     // Sample statistics
     const gameStatistics = {
       totalBets: '1,856,342',
-      totalVolume: '8.3M ETH',
-      maxWin: '243,500 ETH'
+      totalVolume: '8.3M OG',
+      maxWin: '243,500 OG'
     };
     
     return (
@@ -682,7 +682,7 @@ export default function Home() {
               setGameMode={setGameMode}
               betAmount={betAmount}
               setBetAmount={setBetAmount}
-              balance={parseFloat(userBalance || '0')} // Balance is already in ETH
+              balance={parseFloat(userBalance || '0')} // Balance is already in OG
               manulBet={manulBet}
               risk={selectedRisk}
               setRisk={setSelectedRisk}

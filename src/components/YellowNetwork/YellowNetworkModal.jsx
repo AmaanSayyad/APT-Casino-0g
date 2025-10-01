@@ -30,7 +30,7 @@ const YellowNetworkModal = ({ isOpen, onClose, gameType = 'MINES' }) => {
       // Create game session with SDK randomness
       await createGameSession(gameType, {
         network: 'arbitrum-sepolia',
-        token: 'ETH',
+        token: 'OG',
         randomnessSource: 'sdk'
       });
       
@@ -123,8 +123,8 @@ const YellowNetworkModal = ({ isOpen, onClose, gameType = 'MINES' }) => {
             <div className="bg-blue-900/20 border border-blue-600/30 rounded-lg p-3">
               <div className="text-blue-300 font-medium text-sm mb-1">Network Details</div>
               <div className="text-white/70 text-xs space-y-1">
-                <div>🔵 Arbitrum Sepolia Testnet</div>
-                <div>⟠ ETH Token</div>
+                <div>🔵 0G Network Testnet</div>
+                <div>⟠ OG Token</div>
                 <div>🟡 Yellow Network State Channels</div>
               </div>
             </div>

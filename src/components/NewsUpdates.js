@@ -7,8 +7,8 @@ const NewsUpdates = () => {
   const newsItems = [
     {
       id: 1,
-      title: 'New Token Bridge Partnership with Arbitrum',
-      excerpt: 'APT Casino partners with Arbitrum Network to provide seamless cross-chain token transfers with lower fees.',
+      title: 'New Token Bridge Partnership with 0G Network',
+      excerpt: 'APT Casino partners with 0G Network to provide seamless cross-chain token transfers with lower fees.',
       date: '2025-05-08',
       category: 'Partnership',
       image: '/images/news/partnership.png',
@@ -16,7 +16,7 @@ const NewsUpdates = () => {
     },
     {
       id: 2,
-      title: 'ETH Governance Proposal: Community Jackpots',
+      title: 'OG Governance Proposal: Community Jackpots',
       excerpt: 'Vote on the new proposal to allocate 5% of platform fees to community-controlled jackpot pools.',
       date: '2025-05-04',
       category: 'Governance',

@@ -99,7 +99,7 @@ const AppLayout = ({ children }) => {
                 <span className="font-medium">Provably Fair Gaming</span>
               </div>
               <p className="text-sm">
-                All games use Pyth Entropy for verifiable randomness on Arbitrum Sepolia
+                All games use Pyth Entropy for verifiable randomness on 0G Network
               </p>
             </div>
           </div>

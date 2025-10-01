@@ -7,9 +7,9 @@ import { useState, useEffect } from 'react';
  */
 const useTokenStats = () => {
   const [stats, setStats] = useState({
-    totalETHPool: null,
-    ethPrice: null,
-    ethAPY: null,
+    totalOG pool: null,
+    OG price: null,
+    OG APY: null,
     loading: true,
     error: null,
     marketCap: null,
@@ -41,14 +41,14 @@ const useTokenStats = () => {
         // This would typically come from your smart contract
         const calculatedAPY = 5.8 + (Math.random() * 1.2); // Simulating a fluctuating APY
         
-        // Total ETH pool would come from your contract or API
+        // Total OG pool would come from your contract or API
         const totalPoolSize = 203746 + (Math.random() * 1000 - 500); // Simulating fluctuation
         
         // Update the stats
         setStats({
-          totalETHPool: totalPoolSize.toFixed(0),
-          ethPrice: priceData.usd / 100, // Using a fraction of ETH price for demo
-          ethAPY: calculatedAPY.toFixed(2),
+          totalOG pool: totalPoolSize.toFixed(0),
+          OG price: priceData.usd / 100, // Using a fraction of OG price for demo
+          OG APY: calculatedAPY.toFixed(2),
           marketCap: (totalPoolSize * (priceData.usd / 100)).toFixed(2),
           volume24h: (priceData.usd_24h_vol / 1000).toFixed(2),
           priceChange24h: (priceData.usd_24h_change / 2).toFixed(2),

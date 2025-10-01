@@ -9,7 +9,7 @@ import { NotificationProvider } from '@/components/NotificationSystem';
 import WalletConnectionGuard from '@/components/WalletConnectionGuard';
 import { ThemeProvider } from 'next-themes';
 import { WagmiProvider, createConfig, http } from 'wagmi';
-import { arbitrumSepolia } from 'wagmi/chains';
+import { ogGalileo } from '@/config/chains';
 import { RainbowKitProvider, getDefaultConfig, connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { 
   metaMaskWallet,
@@ -108,14 +108,14 @@ export default function Providers({ children }) {
   console.log('🔧 Providers mounting...');
   console.log('🔧 Project ID: 226b43b703188d269fb70d02c107c34e');
 
-  // RainbowKit configuration for Arbitrum
+  // RainbowKit configuration for 0G Galileo only
   let config;
   
   try {
     config = getDefaultConfig({
       appName: 'APT Casino',
       projectId: '226b43b703188d269fb70d02c107c34e',
-      chains: [arbitrumSepolia],
+      chains: [ogGalileo],
       ssr: true,
     });
     console.log('🔧 Config created with getDefaultConfig:', config);
@@ -142,10 +142,10 @@ export default function Providers({ children }) {
 
     config = createConfig({
       connectors,
-      chains: [arbitrumSepolia],
-    transports: {
-      [arbitrumSepolia.id]: http(),
-    },
+      chains: [ogGalileo],
+      transports: {
+        [ogGalileo.id]: http(),
+      },
       ssr: true,
     });
     console.log('🔧 Config created with manual setup:', config);

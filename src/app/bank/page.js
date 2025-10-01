@@ -12,8 +12,8 @@ import { FaChartLine, FaHistory, FaInfoCircle, FaExchangeAlt, FaCoins, FaWallet,
 const BORROW_ASSETS = {
   ethereum_testnet: [
     {
-      symbol: "ETH",
-      name: "Arbitrum Sepolia Coin",
+      symbol: "OG",
+      name: "0G Network Coin",
       iconColor: "#F1324D",
       address: null // Native token
     }
@@ -22,9 +22,9 @@ const BORROW_ASSETS = {
 
 // Mock transaction history
 const MOCK_TRANSACTIONS = [
-  { type: 'deposit', token: 'ETH', amount: '120.5', date: new Date(Date.now() - 86400000 * 2), status: 'completed' },
+  { type: 'deposit', token: 'OG', amount: '120.5', date: new Date(Date.now() - 86400000 * 2), status: 'completed' },
   { type: 'borrow', token: 'MNT', amount: '0.3', date: new Date(Date.now() - 86400000), status: 'completed' },
-  { type: 'swap', tokenFrom: 'MNT', tokenTo: 'ETH', amountFrom: '0.2', amountTo: '98.32', date: new Date(), status: 'completed' }
+  { type: 'swap', tokenFrom: 'MNT', tokenTo: 'OG', amountFrom: '0.2', amountTo: '98.32', date: new Date(), status: 'completed' }
 ];
 
 export default function Bank() {
@@ -36,7 +36,7 @@ export default function Bank() {
   const [transactions, setTransactions] = useState([]);
   const [showNetworkBanner, setShowNetworkBanner] = useState(true);
   const [marketTrends, setMarketTrends] = useState({
-    ethPrice: 2.83,
+    OG price: 2.83,
     eth24hChange: 12.5,
     marketCap: 18500000,
     totalLocked: 3200000
@@ -66,8 +66,8 @@ export default function Bank() {
       setChainId('ethereum_testnet'); // Ethereum testnet for development
       setAssets([
         {
-          symbol: "ETH",
-          name: "Arbitrum Sepolia Coin",
+          symbol: "OG",
+          name: "0G Network Coin",
           iconColor: "#F1324D",
           address: "0x...",
           apr: "12.5%",
@@ -84,8 +84,8 @@ export default function Bank() {
           available: "$320,000"
         },
         {
-          symbol: "ETH",
-          name: "Ethereum",
+          symbol: "OG",
+          name: 'OG',
           iconColor: "#2196F3",
           address: null,
           apr: "4.8%",
@@ -110,8 +110,8 @@ export default function Bank() {
         // Set mock lending market data for Ethereum testnet
         setAssets([
           {
-            symbol: "ETH",
-            name: "Arbitrum Sepolia Coin",
+            symbol: "OG",
+            name: "0G Network Coin",
             iconColor: "#F1324D",
             address: "0x...",
             apr: "12.5%",
@@ -190,7 +190,7 @@ export default function Bank() {
         {showNetworkBanner && (
           <div className="bg-gradient-to-r from-red-magic/80 to-blue-magic/80 py-2 px-4 text-center relative mb-8 rounded-lg">
             <p className="text-white text-sm">
-              Connected to Arbitrum Sepolia Testnet. 
+              Connected to 0G Network Testnet. 
               <button className="underline ml-2">Switch Network</button>
             </p>
             <button 
@@ -247,8 +247,8 @@ export default function Bank() {
                 <div className="bg-gradient-to-r p-[1px] from-red-magic to-blue-magic rounded-xl">
                   {/* Ethereum Testnet Only - No Uniswap Integration */}
         <div className="bg-gray-800 rounded-lg p-6 text-center">
-          <h3 className="text-xl font-semibold text-white mb-2">Arbitrum Sepolia Testnet Only</h3>
-          <p className="text-gray-400">This application works exclusively with Arbitrum testnet</p>
+          <h3 className="text-xl font-semibold text-white mb-2">0G Network Testnet Only</h3>
+          <p className="text-gray-400">This application works exclusively with 0G Network Testnet</p>
         </div>
                 </div>
               </div>
@@ -264,7 +264,7 @@ export default function Bank() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-[#250020] p-4 rounded-lg hover:bg-[#350030] transition-colors">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-white/70 text-sm">ETH Price</span>
+                        <span className="text-white/70 text-sm">OG Price</span>
                         <div className="flex items-center">
                           <div className="h-2 w-16 bg-[#120010] rounded-full overflow-hidden">
                             <div 
@@ -413,7 +413,7 @@ export default function Bank() {
               </p>
               <ul className="space-y-2 mb-4">
                 <li className="flex justify-between">
-                  <span className="text-white/60">ETH</span>
+                  <span className="text-white/60">OG</span>
                   <span className="text-green-500">12.5% APY</span>
                 </li>
                 <li className="flex justify-between">
