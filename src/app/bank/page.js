@@ -36,8 +36,8 @@ export default function Bank() {
   const [transactions, setTransactions] = useState([]);
   const [showNetworkBanner, setShowNetworkBanner] = useState(true);
   const [marketTrends, setMarketTrends] = useState({
-    OG price: 2.83,
-    eth24hChange: 12.5,
+    ogPrice: 2.83,
+    og24hChange: 12.5,
     marketCap: 18500000,
     totalLocked: 3200000
   });
@@ -269,17 +269,17 @@ export default function Bank() {
                           <div className="h-2 w-16 bg-[#120010] rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-gradient-to-r from-red-magic to-blue-magic"
-                              style={{ width: `${Math.min(Math.abs(marketTrends.eth24hChange), 100)}%` }}
+                              style={{ width: `${Math.min(Math.abs(marketTrends.og24hChange), 100)}%` }}
                             ></div>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-baseline">
                         <span className="text-2xl font-bold">
-                          <AnimatedNumber value={marketTrends.ethPrice} prefix="$" />
+                          <AnimatedNumber value={marketTrends.ogPrice} prefix="$" />
                         </span>
-                        <span className={`ml-2 text-sm ${marketTrends.eth24hChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                          {marketTrends.eth24hChange >= 0 ? '↑' : '↓'} {Math.abs(marketTrends.eth24hChange)}%
+                        <span className={`ml-2 text-sm ${marketTrends.og24hChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {marketTrends.og24hChange >= 0 ? '↑' : '↓'} {Math.abs(marketTrends.og24hChange)}%
                         </span>
                       </div>
                     </div>

@@ -42,7 +42,7 @@ const StatsOverview = () => {
                 <div className="h-6 w-20 bg-white/10 animate-pulse rounded"></div>
               ) : (
                 <span className="text-2xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-red-magic to-blue-magic">
-                  {formatNumber(stats.totalOG pool)}
+                  {formatNumber(stats.totalOGPool)}
                 </span>
               )}
             </div>
@@ -55,7 +55,7 @@ const StatsOverview = () => {
                 <div className="h-6 w-16 bg-white/10 animate-pulse rounded"></div>
               ) : (
                 <span className="text-2xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-red-magic to-blue-magic">
-                  {formatPercent(stats.ethAPY)}
+                  {formatPercent(stats.ogAPY)}
                 </span>
               )}
             </div>
@@ -68,7 +68,7 @@ const StatsOverview = () => {
                 <div className="h-6 w-16 bg-white/10 animate-pulse rounded"></div>
               ) : (
                 <span className="text-2xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-red-magic to-blue-magic">
-                  {formatPrice(stats.ethPrice)}
+                  {formatPrice(stats.ogPrice)}
                 </span>
               )}
             </div>

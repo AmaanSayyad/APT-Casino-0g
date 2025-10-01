@@ -7,9 +7,9 @@ import { useState, useEffect } from 'react';
  */
 const useTokenStats = () => {
   const [stats, setStats] = useState({
-    totalOG pool: null,
-    OG price: null,
-    OG APY: null,
+    totalOGPool: null,
+    ogPrice: null,
+    ogAPY: null,
     loading: true,
     error: null,
     marketCap: null,
@@ -46,9 +46,9 @@ const useTokenStats = () => {
         
         // Update the stats
         setStats({
-          totalOG pool: totalPoolSize.toFixed(0),
-          OG price: priceData.usd / 100, // Using a fraction of OG price for demo
-          OG APY: calculatedAPY.toFixed(2),
+          totalOGPool: totalPoolSize.toFixed(0),
+          ogPrice: priceData.usd / 100, // Using a fraction of OG price for demo
+          ogAPY: calculatedAPY.toFixed(2),
           marketCap: (totalPoolSize * (priceData.usd / 100)).toFixed(2),
           volume24h: (priceData.usd_24h_vol / 1000).toFixed(2),
           priceChange24h: (priceData.usd_24h_change / 2).toFixed(2),
