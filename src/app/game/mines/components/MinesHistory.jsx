@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaHistory, FaStar, FaTrophy, FaChartBar, FaChartLine, FaBomb, FaSort, FaSortUp, FaSortDown, FaExternalLinkAlt } from "react-icons/fa";
+import { FaHistory, FaStar, FaTrophy, FaChartBar, FaChartLine, FaBomb, FaSort, FaSortUp, FaSortDown, FaExternalLinkAlt, FaCube } from "react-icons/fa";
+import { getOGNetworkLog } from '@/utils/gameHistory';
 import { GiMining, GiDiamonds, GiTreasureMap, GiGoldBar, GiDiamondHard, GiDiamondTrophy } from "react-icons/gi";
 import { HiClock, HiOutlineLightningBolt } from "react-icons/hi";
 
@@ -10,6 +11,17 @@ const MinesHistory = ({ gameHistory = [], userStats = {} }) => {
   // State for sorting
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+  const [ogLogUpdate, setOgLogUpdate] = useState(0);
+  
+  // Listen for 0G logging completion
+  React.useEffect(() => {
+    const handleOgLogCompleted = () => {
+      setOgLogUpdate(prev => prev + 1);
+    };
+    
+    window.addEventListener('ogLogCompleted', handleOgLogCompleted);
+    return () => window.removeEventListener('ogLogCompleted', handleOgLogCompleted);
+  }, []);
 
   // Open Arbiscan link for transaction hash
   const openArbiscan = (hash) => {
@@ -342,6 +354,25 @@ const MinesHistory = ({ gameHistory = [], userStats = {} }) => {
                           Entropy
                         </button>
                       )}
+                      
+                      {/* 0G Network Button */}
+                      {(() => {
+                        const ogLog = getOGNetworkLog(game.id);
+                        return ogLog ? (
+                          <button
+                            onClick={() => window.open(ogLog.explorerUrl, '_blank')}
+                            className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/10 border border-[#00FF7F]/30 rounded text-[#00FF7F] text-xs hover:bg-[#00FF7F]/20 transition-colors"
+                          >
+                            <FaCube size={8} />
+                            0G
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/5 border border-[#00FF7F]/20 rounded text-[#00FF7F]/60 text-xs">
+                            <div className="w-2 h-2 bg-[#00FF7F] rounded-full animate-pulse"></div>
+                            Logging...
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 ) : (

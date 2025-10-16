@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, CircularProgress, Fade } from '@mui/material';
-import { FaHistory, FaChartLine, FaFire, FaExclamationCircle, FaCoins, FaInfoCircle, FaTrophy, FaDice, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaHistory, FaChartLine, FaFire, FaExclamationCircle, FaCoins, FaInfoCircle, FaTrophy, FaDice, FaExternalLinkAlt, FaCube } from 'react-icons/fa';
+import { getOGNetworkLog } from '@/utils/gameHistory';
 
 // Utility function to format OG amounts with proper decimal precision
 const formatOGAmount = (amount) => {
@@ -198,6 +199,17 @@ const calculateStats = (bets) => {
 const RouletteHistory = ({ bettingHistory = [] }) => {
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [ogLogUpdate, setOgLogUpdate] = useState(0); // Force re-render when 0G log completes
+  
+  // Listen for 0G logging completion
+  useEffect(() => {
+    const handleOgLogCompleted = () => {
+      setOgLogUpdate(prev => prev + 1);
+    };
+    
+    window.addEventListener('ogLogCompleted', handleOgLogCompleted);
+    return () => window.removeEventListener('ogLogCompleted', handleOgLogCompleted);
+  }, []);
   const [bets, setBets] = useState([]);
   
   // Update bets when bettingHistory prop changes
@@ -586,6 +598,46 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                     </Typography>
                                   </Box>
                                 )}
+                                
+                                {/* 0G Network Button */}
+                                {(() => {
+                                  const ogLog = getOGNetworkLog(bet.id);
+                                  return ogLog ? (
+                                    <Box
+                                      component="a"
+                                      href={ogLog.explorerUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.5,
+                                        cursor: 'pointer',
+                                        padding: '2px 6px',
+                                        borderRadius: '4px',
+                                        backgroundColor: 'rgba(0, 255, 127, 0.1)',
+                                        border: '1px solid rgba(0, 255, 127, 0.3)',
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': {
+                                          backgroundColor: 'rgba(0, 255, 127, 0.2)',
+                                          transform: 'scale(1.05)'
+                                        }
+                                      }}
+                                    >
+                                      <FaCube size={10} color="#00FF7F" />
+                                      <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                        0G
+                                      </Typography>
+                                    </Box>
+                                  ) : (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                      <CircularProgress size={12} sx={{ color: '#00FF7F' }} />
+                                      <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.6rem' }}>
+                                        Logging...
+                                      </Typography>
+                                    </Box>
+                                  );
+                                })()}
                               </Box>
                             </Box>
                           ) : (

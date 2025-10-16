@@ -1,9 +1,21 @@
 "use client";
-import { useState } from "react";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaExternalLinkAlt, FaCube } from "react-icons/fa";
+import { getOGNetworkLog } from '@/utils/gameHistory';
 
 export default function GameHistory({ history }) {
   const [visibleCount, setVisibleCount] = useState(5);
+  const [ogLogUpdate, setOgLogUpdate] = useState(0);
+  
+  // Listen for 0G logging completion
+  useEffect(() => {
+    const handleOgLogCompleted = () => {
+      setOgLogUpdate(prev => prev + 1);
+    };
+    
+    window.addEventListener('ogLogCompleted', handleOgLogCompleted);
+    return () => window.removeEventListener('ogLogCompleted', handleOgLogCompleted);
+  }, []);
   
   // Open Entropy Explorer link
   const openEntropyExplorer = (txHash) => {
@@ -126,6 +138,25 @@ export default function GameHistory({ history }) {
                               Entropy
                             </button>
                           )}
+                          
+                          {/* 0G Network Button */}
+                          {(() => {
+                            const ogLog = getOGNetworkLog(game.id);
+                            return ogLog ? (
+                              <button
+                                onClick={() => window.open(ogLog.explorerUrl, '_blank')}
+                                className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/10 border border-[#00FF7F]/30 rounded text-[#00FF7F] text-xs hover:bg-[#00FF7F]/20 transition-colors"
+                              >
+                                <FaCube size={8} />
+                                0G
+                              </button>
+                            ) : (
+                              <div className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/5 border border-[#00FF7F]/20 rounded text-[#00FF7F]/60 text-xs">
+                                <div className="w-2 h-2 bg-[#00FF7F] rounded-full animate-pulse"></div>
+                                Logging...
+                              </div>
+                            );
+                          })()}
                         </div>
                       </>
                     ) : (
@@ -144,6 +175,25 @@ export default function GameHistory({ history }) {
                           <FaExternalLinkAlt size={8} />
                           Entropy
                         </button>
+                        
+                        {/* 0G Network Button */}
+                        {(() => {
+                          const ogLog = getOGNetworkLog(game.id);
+                          return ogLog ? (
+                            <button
+                              onClick={() => window.open(ogLog.explorerUrl, '_blank')}
+                              className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/10 border border-[#00FF7F]/30 rounded text-[#00FF7F] text-xs hover:bg-[#00FF7F]/20 transition-colors"
+                            >
+                              <FaCube size={8} />
+                              0G
+                            </button>
+                          ) : (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/5 border border-[#00FF7F]/20 rounded text-[#00FF7F]/60 text-xs">
+                              <div className="w-2 h-2 bg-[#00FF7F] rounded-full animate-pulse"></div>
+                              Logging...
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>

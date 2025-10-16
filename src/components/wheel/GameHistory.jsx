@@ -1,14 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 // Using Next.js public asset reference instead of import
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { FaExternalLinkAlt, FaCube } from "react-icons/fa";
+import { getOGNetworkLog } from '@/utils/gameHistory';
 
 const GameHistory = ({ gameHistory }) => {
   const [activeTab, setActiveTab] = useState("my-bet");
   const [entriesShown, setEntriesShown] = useState(10);
+  const [ogLogUpdate, setOgLogUpdate] = useState(0);
+  
+  // Listen for 0G logging completion
+  useEffect(() => {
+    const handleOgLogCompleted = () => {
+      setOgLogUpdate(prev => prev + 1);
+    };
+    
+    window.addEventListener('ogLogCompleted', handleOgLogCompleted);
+    return () => window.removeEventListener('ogLogCompleted', handleOgLogCompleted);
+  }, []);
   
   // Format transaction hash for display
   const formatTxHash = (hash) => {
@@ -150,6 +162,25 @@ const GameHistory = ({ gameHistory }) => {
                                 Entropy
                               </button>
                             )}
+                            
+                            {/* 0G Network Button */}
+                            {(() => {
+                              const ogLog = getOGNetworkLog(item.id);
+                              return ogLog ? (
+                                <button
+                                  onClick={() => window.open(ogLog.explorerUrl, '_blank')}
+                                  className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/10 border border-[#00FF7F]/30 rounded text-[#00FF7F] text-xs hover:bg-[#00FF7F]/20 transition-colors"
+                                >
+                                  <FaCube size={8} />
+                                  0G
+                                </button>
+                              ) : (
+                                <div className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/5 border border-[#00FF7F]/20 rounded text-[#00FF7F]/60 text-xs">
+                                  <div className="w-2 h-2 bg-[#00FF7F] rounded-full animate-pulse"></div>
+                                  Logging...
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       ) : (
