@@ -141,28 +141,7 @@ export const saveGameResult = async (gameData) => {
 export const getOGNetworkLog = (gameId) => {
   try {
     const logData = localStorage.getItem(`og_log_${gameId}`);
-    if (!logData) {
-      // Fallback: pick most recent successful 0G log from last 90 seconds
-      try {
-        let latest = null;
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith('og_log_')) {
-            const raw = localStorage.getItem(key);
-            const parsed = JSON.parse(raw || '{}');
-            if (!parsed?.failed && parsed?.transactionHash && parsed?.timestamp) {
-              if (!latest || parsed.timestamp > latest.timestamp) {
-                latest = parsed;
-              }
-            }
-          }
-        }
-        if (latest && Date.now() - latest.timestamp < 90000) {
-          return latest;
-        }
-      } catch (_) {}
-      return null;
-    }
+    if (!logData) return null;
     
     const parsed = JSON.parse(logData);
     

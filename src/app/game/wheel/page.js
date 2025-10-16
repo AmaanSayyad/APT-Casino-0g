@@ -20,6 +20,8 @@ import useWalletStatus from '@/hooks/useWalletStatus';
 // import VRFProofRequiredModal from '@/components/VRF/VRFProofRequiredModal';
 // import vrfLogger from '@/services/VRFLoggingService';
 import pythEntropyService from '@/services/PythEntropyService';
+import { useGameHistory } from '@/hooks/useGameHistory';
+import { useAccount } from 'wagmi';
 
 // Import new components
 import WheelVideo from "./components/WheelVideo";
@@ -83,6 +85,8 @@ export default function Home() {
   };
 
   // Game modes
+  const { saveWheelGame } = useGameHistory();
+  const { address } = useAccount();
   const manulBet = async () => {
     if (betAmount <= 0 || isSpinning) return;
 
@@ -258,6 +262,21 @@ export default function Home() {
           generateEntropyInBackground(newHistoryItem.id).catch(error => {
             console.error('❌ Background entropy generation failed:', error);
           });
+
+          // Save to history -> triggers 0G logging
+          try {
+            await saveWheelGame({
+              userAddress: address || '0x0000000000000000000000000000000000000001',
+              vrfRequestId: newHistoryItem?.entropyProof?.requestId,
+              vrfTransactionHash: newHistoryItem?.entropyProof?.transactionHash,
+              vrfValue: newHistoryItem?.entropyProof?.randomValue,
+              gameConfig: { segments: noOfSegments, riskLevel: 'medium' },
+              resultData: { segment: 0, multiplier: actualMultiplier, color: detectedColor, totalSegments: noOfSegments },
+              betAmount: String(betAmount || 0),
+              payoutAmount: String(winAmount || 0),
+              clientBetId: `wheel_${Date.now()}_${Math.floor(Math.random()*1e6)}`
+            });
+          } catch (e) { console.warn('saveWheelGame failed:', e); }
           
           // Clean up callback
           window.wheelBetCallback = null;

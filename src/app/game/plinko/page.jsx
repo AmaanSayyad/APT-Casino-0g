@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { useGameHistory } from '@/hooks/useGameHistory';
 import PlinkoGame from "./components/PlinkoGame";
 import GameHistory from "./components/GameHistory";
 import GameControls from "./components/GameControls";
@@ -25,6 +26,7 @@ export default function Plinko() {
   const [showMobileWarning, setShowMobileWarning] = useState(false);
 
   const plinkoGameRef = useRef(null);
+  const { savePlinkoGame } = useGameHistory();
 
   // Smooth scroll helper
   const scrollToElement = (elementId) => {
@@ -221,11 +223,28 @@ export default function Plinko() {
       
       console.log('📝 Enhanced bet result:', enhancedBetResult);
       setGameHistory(prev => [enhancedBetResult, ...prev].slice(0, 100)); // Keep up to last 100 entries
+
+      // Save to history -> triggers 0G logging
+      try {
+        await savePlinkoGame({
+          userAddress: enhancedBetResult.userAddress || '0x0000000000000000000000000000000000000001',
+          vrfRequestId: enhancedBetResult.entropyProof?.requestId,
+          vrfTransactionHash: enhancedBetResult.entropyProof?.transactionHash,
+          vrfValue: enhancedBetResult.entropyProof?.randomValue,
+          gameConfig: { rows: currentRows, risk: currentRiskLevel },
+          resultData: { finalSlot: enhancedBetResult.finalSlot, multiplier: enhancedBetResult.multiplier, rows: currentRows },
+          betAmount: String(enhancedBetResult.betAmount || enhancedBetResult.amount || 0),
+          payoutAmount: String(enhancedBetResult.payout || 0),
+          clientBetId: `plinko_${Date.now()}_${Math.floor(Math.random()*1e6)}`
+        });
+      } catch (e) {
+        console.warn('savePlinkoGame failed:', e);
+      }
       
     } catch (error) {
       console.error('❌ Error using Yellow Network for Plinko game:', error);
       
-      // Still add the bet result even if Yellow Network fails
+      // Still add the bet result even if entropy fails
       setGameHistory(prev => [newBetResult, ...prev].slice(0, 100));
     }
   };

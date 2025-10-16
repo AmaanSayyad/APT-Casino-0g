@@ -31,7 +31,8 @@ export default async function handler(req, res) {
       gameConfig,
       resultData,
       betAmount,
-      payoutAmount
+      payoutAmount,
+      clientBetId
     } = req.body;
 
     // Validate required fields
@@ -88,6 +89,7 @@ export default async function handler(req, res) {
         betAmount: betAmount || null,
         payoutAmount: payoutAmount || null,
         createdAt: new Date().toISOString(),
+        clientBetId: clientBetId || `client_${Date.now()}`,
         mock: true
       };
     }

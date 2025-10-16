@@ -2077,7 +2077,8 @@ export default function GameRoulette() {
               gameConfig: { betType: 'multiple', betValue: winningNumber, wheelType: 'european' },
               resultData: { number: winningNumber, color: null, properties: {}, ...newBet },
               betAmount: totalBetAmount.toString(),
-              payoutAmount: netResult.toString()
+              payoutAmount: netResult.toString(),
+              clientBetId: newBet.id
             }).then((r) => console.log('💾 Roulette saved to history (triggers 0G):', r)).catch((e) => console.warn('Save history failed:', e));
           } catch (e) {
             console.warn('saveRouletteGame threw:', e);

@@ -25,6 +25,7 @@ import GameDetail from "@/components/GameDetail";
 import AIAutoBetting from "./components/AIAutoBetting";
 import AISettingsModal from "./components/AISettingsModal";
 import pythEntropyService from '@/services/PythEntropyService';
+import { useGameHistory } from '@/hooks/useGameHistory';
 
 export default function Mines() {
   // Game State
@@ -35,6 +36,7 @@ export default function Mines() {
   const [isStatsExpanded, setIsStatsExpanded] = useState(false);
   const [gameStatus, setGameStatus] = useState({ isPlaying: false, hasPlacedBet: false });
   const [gameHistory, setGameHistory] = useState([]);
+  const { saveMinesGame } = useGameHistory();
   
   // AI Auto Betting State
   const [isAIActive, setIsAIActive] = useState(false);
@@ -232,6 +234,21 @@ export default function Mines() {
     
     setGameHistory(prev => [newHistoryItem, ...prev].slice(0, 50));
     
+    // Save to history -> triggers 0G logging via API (shared util)
+    try {
+      await saveMinesGame({
+        userAddress: address || '0x0000000000000000000000000000000000000001',
+        vrfRequestId: entropyProof?.requestId,
+        vrfTransactionHash: entropyProof?.transactionHash,
+        vrfValue: entropyProof?.randomValue,
+        gameConfig: { mineCount: result.mines || 0, gridSize: 25 },
+        resultData: { hitMine: !result.won, totalMines: result.mines || 0, revealedTiles: result.revealedTiles || [] },
+        betAmount: String(result.betAmount || 0),
+        payoutAmount: String(result.payout || 0),
+        clientBetId: newHistoryItem.id
+      });
+    } catch (e) { console.warn('saveMinesGame failed:', e); }
+
     // Fire-and-forget casino session log
     try {
       fetch('/api/casino-session', {

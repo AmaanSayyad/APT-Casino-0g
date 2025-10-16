@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, TextField, InputAdornment, Select, MenuItem, FormControl, Chip, Pagination, Divider, Fade } from "@mui/material";
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, TextField, InputAdornment, Select, MenuItem, FormControl, Chip, Pagination, Divider, Fade, CircularProgress } from "@mui/material";
+import { getOGNetworkLog } from '@/utils/gameHistory';
 import { FaHistory, FaFilter, FaDownload, FaSearch, FaTrophy, FaChartLine, FaExternalLinkAlt, FaCheck } from "react-icons/fa";
 import Image from "next/image";
 // Using Next.js public asset reference instead of import
@@ -615,6 +616,33 @@ const WheelHistory = ({ gameHistory = [] }) => {
                           >
                             Entropy
                           </Button>
+                          {/* 0G link */}
+                          {(() => {
+                            const og = getOGNetworkLog(item.id);
+                            return og ? (
+                              <Button
+                                onClick={() => window.open(og.explorerUrl, '_blank')}
+                                size="small"
+                                startIcon={<FaExternalLinkAlt size={10} />}
+                                sx={{ 
+                                  color: '#00FF7F',
+                                  fontSize: '0.7rem',
+                                  minWidth: 'auto',
+                                  p: 0,
+                                  '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' }
+                                }}
+                              >
+                                0G
+                              </Button>
+                            ) : (
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <CircularProgress size={12} sx={{ color: '#00FF7F' }} />
+                                <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.6rem' }}>
+                                  Logging...
+                                </Typography>
+                              </Box>
+                            );
+                          })()}
                         </Box>
                         <Typography variant="caption" color="rgba(255,255,255,0.5)">
                           Pyth Entropy
