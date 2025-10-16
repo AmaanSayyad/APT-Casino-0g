@@ -29,6 +29,15 @@ export default function GameControls({ onBet, onRowChange, onRiskLevelChange, on
     setRows(initialRows);
   }, [initialRiskLevel, initialRows]);
 
+  // Notify parent about initial bet amount when component mounts
+  useEffect(() => {
+    if (onBetAmountChange) {
+      const initialBetAmount = parseFloat(betAmount) || 0;
+      console.log('GameControls: Notifying parent about initial bet amount:', initialBetAmount);
+      onBetAmountChange(initialBetAmount);
+    }
+  }, [onBetAmountChange]); // Only run once when component mounts
+
   // Cleanup auto betting interval when component unmounts or game mode changes
   useEffect(() => {
     return () => {
