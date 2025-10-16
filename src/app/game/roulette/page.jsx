@@ -2078,8 +2078,24 @@ export default function GameRoulette() {
               resultData: { number: winningNumber, color: null, properties: {}, ...newBet },
               betAmount: totalBetAmount.toString(),
               payoutAmount: netResult.toString(),
-              clientBetId: newBet.id
-            }).then((r) => console.log('💾 Roulette saved to history (triggers 0G):', r)).catch((e) => console.warn('Save history failed:', e));
+              clientBetId: newBet.id.toString()
+            }).then((saveResult) => {
+              console.log('💾 Roulette saved to history (triggers 0G):', saveResult);
+              
+              // Update the betting history with 0G network log info
+              if (saveResult && saveResult.ogNetworkLog) {
+                setBettingHistory(prev => {
+                  const updatedHistory = [...prev];
+                  if (updatedHistory.length > 0) {
+                    updatedHistory[0] = { 
+                      ...updatedHistory[0], 
+                      ogNetworkLog: saveResult.ogNetworkLog 
+                    };
+                  }
+                  return updatedHistory;
+                });
+              }
+            }).catch((e) => console.warn('Save history failed:', e));
           } catch (e) {
             console.warn('saveRouletteGame threw:', e);
           }

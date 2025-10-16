@@ -618,30 +618,43 @@ const WheelHistory = ({ gameHistory = [] }) => {
                           </Button>
                           {/* 0G link */}
                           {(() => {
-                            const og = getOGNetworkLog(item.id);
-                            return og ? (
-                              <Button
-                                onClick={() => window.open(og.explorerUrl, '_blank')}
-                                size="small"
-                                startIcon={<FaExternalLinkAlt size={10} />}
-                                sx={{ 
-                                  color: '#00FF7F',
-                                  fontSize: '0.7rem',
-                                  minWidth: 'auto',
-                                  p: 0,
-                                  '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' }
-                                }}
-                              >
-                                0G
-                              </Button>
-                            ) : (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <CircularProgress size={12} sx={{ color: '#00FF7F' }} />
-                                <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.6rem' }}>
-                                  Logging...
-                                </Typography>
-                              </Box>
-                            );
+                            const og = getOGNetworkLog(item);
+                            console.log('🔍 WheelHistory - item ID:', item.id, 'has ogNetworkLog:', !!item.ogNetworkLog, 'og result:', og);
+                            if (og && !og.failed) {
+                              return (
+                                <Button
+                                  onClick={() => window.open(og.explorerUrl, '_blank')}
+                                  size="small"
+                                  startIcon={<FaExternalLinkAlt size={10} />}
+                                  sx={{ 
+                                    color: '#00FF7F',
+                                    fontSize: '0.7rem',
+                                    minWidth: 'auto',
+                                    p: 0,
+                                    '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' }
+                                  }}
+                                >
+                                  0G
+                                </Button>
+                              );
+                            } else if (og && og.failed) {
+                              return (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="caption" sx={{ color: '#FF4500', fontSize: '0.6rem' }}>
+                                    Failed
+                                  </Typography>
+                                </Box>
+                              );
+                            } else {
+                              return (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <CircularProgress size={12} sx={{ color: '#00FF7F' }} />
+                                  <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.6rem' }}>
+                                    Logging...
+                                  </Typography>
+                                </Box>
+                              );
+                            }
                           })()}
                         </Box>
                         <Typography variant="caption" color="rgba(255,255,255,0.5)">

@@ -226,17 +226,30 @@ export default function Plinko() {
 
       // Save to history -> triggers 0G logging
       try {
-        await savePlinkoGame({
+        const saveResult = await savePlinkoGame({
           userAddress: enhancedBetResult.userAddress || '0x0000000000000000000000000000000000000001',
           vrfRequestId: enhancedBetResult.entropyProof?.requestId,
           vrfTransactionHash: enhancedBetResult.entropyProof?.transactionHash,
           vrfValue: enhancedBetResult.entropyProof?.randomValue,
           gameConfig: { rows: currentRows, risk: currentRiskLevel },
           resultData: { finalSlot: enhancedBetResult.finalSlot, multiplier: enhancedBetResult.multiplier, rows: currentRows },
-          betAmount: String(enhancedBetResult.betAmount || enhancedBetResult.amount || 0),
+          betAmount: String(parseFloat(enhancedBetResult.betAmount) || parseFloat(enhancedBetResult.amount) || 0),
           payoutAmount: String(enhancedBetResult.payout || 0),
-          clientBetId: `plinko_${Date.now()}_${Math.floor(Math.random()*1e6)}`
+          clientBetId: enhancedBetResult.id.toString()
         });
+        
+        console.log('💾 Plinko saved to history (triggers 0G):', saveResult);
+        
+        // Update game history with 0G network log info
+        if (saveResult && saveResult.ogNetworkLog) {
+          setGameHistory(prev => {
+            return prev.map(item => 
+              item.id === enhancedBetResult.id 
+                ? { ...item, ogNetworkLog: saveResult.ogNetworkLog }
+                : item
+            );
+          });
+        }
       } catch (e) {
         console.warn('savePlinkoGame failed:', e);
       }

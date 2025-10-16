@@ -357,21 +357,35 @@ const MinesHistory = ({ gameHistory = [], userStats = {} }) => {
                       
                       {/* 0G Network Button */}
                       {(() => {
-                        const ogLog = getOGNetworkLog(game.id);
-                        return ogLog ? (
-                          <button
-                            onClick={() => window.open(ogLog.explorerUrl, '_blank')}
-                            className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/10 border border-[#00FF7F]/30 rounded text-[#00FF7F] text-xs hover:bg-[#00FF7F]/20 transition-colors"
-                          >
-                            <FaCube size={8} />
-                            0G
-                          </button>
-                        ) : (
-                          <div className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/5 border border-[#00FF7F]/20 rounded text-[#00FF7F]/60 text-xs">
-                            <div className="w-2 h-2 bg-[#00FF7F] rounded-full animate-pulse"></div>
-                            Logging...
-                          </div>
-                        );
+                        const ogLog = getOGNetworkLog(game);
+                        if (ogLog && !ogLog.failed) {
+                          return (
+                            <button
+                              onClick={() => window.open(ogLog.explorerUrl, '_blank')}
+                              className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/10 border border-[#00FF7F]/30 rounded text-[#00FF7F] text-xs hover:bg-[#00FF7F]/20 transition-colors"
+                            >
+                              <FaCube size={8} />
+                              0G
+                            </button>
+                          );
+                        } else if (ogLog && ogLog.failed) {
+                          return (
+                            <div 
+                              className="flex items-center gap-1 px-2 py-1 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-xs"
+                              title={`Failed: ${ogLog.error}`}
+                            >
+                              <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                              Failed
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-[#00FF7F]/5 border border-[#00FF7F]/20 rounded text-[#00FF7F]/60 text-xs">
+                              <div className="w-2 h-2 bg-[#00FF7F] rounded-full animate-pulse"></div>
+                              Logging...
+                            </div>
+                          );
+                        }
                       })()}
                     </div>
                   </div>

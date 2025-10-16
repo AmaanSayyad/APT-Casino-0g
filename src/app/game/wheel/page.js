@@ -210,8 +210,9 @@ export default function Home() {
           const winAmount = betAmount * actualMultiplier;
           
           // Add to game history
+          const historyItemId = Date.now();
           const newHistoryItem = {
-            id: Date.now(),
+            id: historyItemId,
             game: 'Wheel',
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             betAmount: betAmount.toFixed(5),
@@ -259,13 +260,13 @@ export default function Home() {
           }
 
           // Generate Pyth Entropy in background for provably fair proof
-          generateEntropyInBackground(newHistoryItem.id).catch(error => {
+          generateEntropyInBackground(historyItemId).catch(error => {
             console.error('❌ Background entropy generation failed:', error);
           });
 
           // Save to history -> triggers 0G logging
           try {
-            await saveWheelGame({
+            const saveResult = await saveWheelGame({
               userAddress: address || '0x0000000000000000000000000000000000000001',
               vrfRequestId: newHistoryItem?.entropyProof?.requestId,
               vrfTransactionHash: newHistoryItem?.entropyProof?.transactionHash,
@@ -274,8 +275,30 @@ export default function Home() {
               resultData: { segment: 0, multiplier: actualMultiplier, color: detectedColor, totalSegments: noOfSegments },
               betAmount: String(betAmount || 0),
               payoutAmount: String(winAmount || 0),
-              clientBetId: `wheel_${Date.now()}_${Math.floor(Math.random()*1e6)}`
+              clientBetId: historyItemId.toString()
             });
+            
+            console.log('💾 Wheel saved to history (triggers 0G):', saveResult);
+            
+            // Update game history with 0G network log info
+            if (saveResult && saveResult.ogNetworkLog) {
+              console.log('🔄 Updating wheel history with 0G log for ID:', historyItemId);
+              console.log('🔄 ogNetworkLog:', saveResult.ogNetworkLog);
+              setGameHistory(prev => {
+                console.log('🔄 Previous history:', prev.map(item => ({ id: item.id, hasOgLog: !!item.ogNetworkLog })));
+                const updated = prev.map(item => 
+                  item.id === historyItemId 
+                    ? { ...item, ogNetworkLog: saveResult.ogNetworkLog }
+                    : item
+                );
+                const updatedItem = updated.find(item => item.id === historyItemId);
+                console.log('🔄 Updated item:', { id: updatedItem?.id, hasOgLog: !!updatedItem?.ogNetworkLog, ogLog: updatedItem?.ogNetworkLog });
+                console.log('🔄 All updated history:', updated.map(item => ({ id: item.id, hasOgLog: !!item.ogNetworkLog })));
+                return updated;
+              });
+            } else {
+              console.warn('⚠️ No ogNetworkLog in saveResult:', saveResult);
+            }
           } catch (e) { console.warn('saveWheelGame failed:', e); }
           
           // Clean up callback

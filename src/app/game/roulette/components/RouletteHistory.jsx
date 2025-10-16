@@ -601,42 +601,66 @@ const RouletteHistory = ({ bettingHistory = [] }) => {
                                 
                                 {/* 0G Network Button */}
                                 {(() => {
-                                  const ogLog = getOGNetworkLog(bet.id);
-                                  return ogLog ? (
-                                    <Box
-                                      component="a"
-                                      href={ogLog.explorerUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.5,
-                                        cursor: 'pointer',
-                                        padding: '2px 6px',
-                                        borderRadius: '4px',
-                                        backgroundColor: 'rgba(0, 255, 127, 0.1)',
-                                        border: '1px solid rgba(0, 255, 127, 0.3)',
-                                        transition: 'all 0.2s ease',
-                                        '&:hover': {
-                                          backgroundColor: 'rgba(0, 255, 127, 0.2)',
-                                          transform: 'scale(1.05)'
-                                        }
-                                      }}
-                                    >
-                                      <FaCube size={10} color="#00FF7F" />
-                                      <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                                        0G
-                                      </Typography>
-                                    </Box>
-                                  ) : (
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                      <CircularProgress size={12} sx={{ color: '#00FF7F' }} />
-                                      <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.6rem' }}>
-                                        Logging...
-                                      </Typography>
-                                    </Box>
-                                  );
+                                  const ogLog = getOGNetworkLog(bet);
+                                  if (ogLog && !ogLog.failed) {
+                                    return (
+                                      <Box
+                                        component="a"
+                                        href={ogLog.explorerUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        sx={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: 0.5,
+                                          cursor: 'pointer',
+                                          padding: '2px 6px',
+                                          borderRadius: '4px',
+                                          backgroundColor: 'rgba(0, 255, 127, 0.1)',
+                                          border: '1px solid rgba(0, 255, 127, 0.3)',
+                                          transition: 'all 0.2s ease',
+                                          '&:hover': {
+                                            backgroundColor: 'rgba(0, 255, 127, 0.2)',
+                                            transform: 'scale(1.05)'
+                                          }
+                                        }}
+                                      >
+                                        <FaCube size={10} color="#00FF7F" />
+                                        <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                          0G
+                                        </Typography>
+                                      </Box>
+                                    );
+                                  } else if (ogLog && ogLog.failed) {
+                                    return (
+                                      <Box 
+                                        sx={{ 
+                                          display: 'flex', 
+                                          alignItems: 'center', 
+                                          gap: 0.5,
+                                          padding: '2px 6px',
+                                          borderRadius: '4px',
+                                          backgroundColor: 'rgba(255, 69, 0, 0.1)',
+                                          border: '1px solid rgba(255, 69, 0, 0.3)',
+                                        }}
+                                        title={`Failed: ${ogLog.error}`}
+                                      >
+                                        <FaExclamationCircle size={10} color="#FF4500" />
+                                        <Typography variant="caption" sx={{ color: '#FF4500', fontSize: '0.6rem' }}>
+                                          Failed
+                                        </Typography>
+                                      </Box>
+                                    );
+                                  } else {
+                                    return (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <CircularProgress size={12} sx={{ color: '#00FF7F' }} />
+                                        <Typography variant="caption" sx={{ color: '#00FF7F', fontSize: '0.6rem' }}>
+                                          Logging...
+                                        </Typography>
+                                      </Box>
+                                    );
+                                  }
                                 })()}
                               </Box>
                             </Box>

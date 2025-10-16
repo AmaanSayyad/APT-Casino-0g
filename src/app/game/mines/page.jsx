@@ -236,7 +236,7 @@ export default function Mines() {
     
     // Save to history -> triggers 0G logging via API (shared util)
     try {
-      await saveMinesGame({
+      const saveResult = await saveMinesGame({
         userAddress: address || '0x0000000000000000000000000000000000000001',
         vrfRequestId: entropyProof?.requestId,
         vrfTransactionHash: entropyProof?.transactionHash,
@@ -245,8 +245,21 @@ export default function Mines() {
         resultData: { hitMine: !result.won, totalMines: result.mines || 0, revealedTiles: result.revealedTiles || [] },
         betAmount: String(result.betAmount || 0),
         payoutAmount: String(result.payout || 0),
-        clientBetId: newHistoryItem.id
+        clientBetId: newHistoryItem.id.toString()
       });
+      
+      console.log('💾 Mines saved to history (triggers 0G):', saveResult);
+      
+      // Update game history with 0G network log info
+      if (saveResult && saveResult.ogNetworkLog) {
+        setGameHistory(prev => {
+          return prev.map(item => 
+            item.id === newHistoryItem.id 
+              ? { ...item, ogNetworkLog: saveResult.ogNetworkLog }
+              : item
+          );
+        });
+      }
     } catch (e) { console.warn('saveMinesGame failed:', e); }
 
     // Fire-and-forget casino session log

@@ -19,7 +19,8 @@ export const saveGameResult = async (gameData) => {
       betAmount,
       payoutAmount,
       vrfTransactionHash,
-      vrfValue
+      vrfValue,
+      clientBetId
     } = gameData;
 
     // Validate required fields
@@ -56,8 +57,9 @@ export const saveGameResult = async (gameData) => {
     console.log('✅ Game result saved successfully:', data.data.gameResult.id);
 
     // Log to 0G Network in background (don't wait for it)
+    const gameId = clientBetId || data.data.gameResult.id;
     const ogLogData = {
-      gameId: data.data.gameResult.id,
+      gameId: gameId,
       gameType: gameType,
       userAddress: userAddress,
       betAmount: betAmount,
@@ -72,8 +74,8 @@ export const saveGameResult = async (gameData) => {
       }
     };
 
-    // Log to 0G Network via API asynchronously with retry and completion event on failure
-    console.log('🔮 Starting 0G Network logging for game:', data.data.gameResult.id);
+    // Log to 0G Network synchronously and wait for result
+    console.log('🔮 Starting 0G Network logging for game:', gameId);
 
     const postLog = async () => {
       const res = await fetch('/api/log-to-0g', {
@@ -84,48 +86,44 @@ export const saveGameResult = async (gameData) => {
       return res.json().catch(() => ({ success: false, error: 'Invalid JSON from logger API' }));
     };
 
-    (async () => {
-      let ogResult;
-      try {
+    let ogResult;
+    try {
+      ogResult = await postLog();
+      if (!ogResult?.success) {
+        // brief retry once
+        await new Promise(r => setTimeout(r, 1200));
         ogResult = await postLog();
-        if (!ogResult?.success) {
-          // brief retry once
-          await new Promise(r => setTimeout(r, 1200));
-          ogResult = await postLog();
-        }
-      } catch (e) {
-        ogResult = { success: false, error: e?.message || 'Network error' };
       }
+    } catch (e) {
+      ogResult = { success: false, error: e?.message || 'Network error' };
+    }
 
-      console.log('🔮 0G Network logging result:', ogResult);
-      if (ogResult.success) {
-        console.log('✅ Game result logged to 0G Network:', ogResult.transactionHash);
-        localStorage.setItem(`og_log_${data.data.gameResult.id}`, JSON.stringify({
-          transactionHash: ogResult.transactionHash,
-          blockNumber: ogResult.blockNumber,
-          explorerUrl: ogResult.explorerUrl,
-          timestamp: Date.now()
-        }));
-        window.dispatchEvent(new CustomEvent('ogLogCompleted', { detail: { gameId: data.data.gameResult.id } }));
-      } else {
-        console.warn('⚠️ Failed to log to 0G Network:', ogResult.error);
-        localStorage.setItem(`og_log_${data.data.gameResult.id}`, JSON.stringify({
-          transactionHash: null,
-          error: ogResult.error,
-          timestamp: Date.now(),
-          failed: true
-        }));
-        // Notify UI so it can stop spinning
-        window.dispatchEvent(new CustomEvent('ogLogCompleted', { detail: { gameId: data.data.gameResult.id, failed: true } }));
-      }
-    })();
-
-    return {
+    console.log('🔮 0G Network logging result:', ogResult);
+    
+    // Add 0G transaction info to the result
+    const finalResult = {
       success: true,
-      gameId: data.data.gameResult.id,
+      gameId: gameId,
       vrfDetails: data.data.vrfDetails,
+      ogNetworkLog: ogResult.success ? {
+        transactionHash: ogResult.transactionHash,
+        blockNumber: ogResult.blockNumber,
+        explorerUrl: ogResult.explorerUrl,
+        network: ogResult.network
+      } : {
+        failed: true,
+        error: ogResult.error
+      },
       message: 'Game result saved with VRF verification and 0G Network logging'
     };
+
+    if (ogResult.success) {
+      console.log('✅ Game result logged to 0G Network:', ogResult.transactionHash);
+    } else {
+      console.warn('⚠️ Failed to log to 0G Network:', ogResult.error);
+    }
+
+    return finalResult;
 
   } catch (error) {
     console.error('❌ Failed to save game result:', error);
@@ -138,24 +136,16 @@ export const saveGameResult = async (gameData) => {
  * @param {string} gameId - Game ID
  * @returns {Object|null} 0G Network log data
  */
-export const getOGNetworkLog = (gameId) => {
-  try {
-    const logData = localStorage.getItem(`og_log_${gameId}`);
-    if (!logData) return null;
-    
-    const parsed = JSON.parse(logData);
-    
-    // If it failed, return null so it shows "Logging..." or error state
-    if (parsed.failed) {
-      console.warn(`0G Network logging failed for game ${gameId}:`, parsed.error);
-      return null;
-    }
-    
-    return parsed;
-  } catch (error) {
-    console.warn('Failed to get 0G Network log:', error);
+export const getOGNetworkLog = (gameData) => {
+  if (!gameData) return null;
+  
+  // If gameData is just an ID (legacy), return null to show loading
+  if (typeof gameData === 'string') {
     return null;
   }
+  
+  // Return the 0G network log from game data
+  return gameData.ogNetworkLog || null;
 };
 
 /**
