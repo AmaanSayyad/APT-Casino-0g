@@ -72,57 +72,53 @@ export const saveGameResult = async (gameData) => {
       }
     };
 
-    // Log to 0G Network via API asynchronously
+    // Log to 0G Network via API asynchronously with retry and completion event on failure
     console.log('🔮 Starting 0G Network logging for game:', data.data.gameResult.id);
-    
-    fetch('/api/log-to-0g', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(ogLogData)
-    })
-    .then(response => response.json())
-    .then(ogResult => {
+
+    const postLog = async () => {
+      const res = await fetch('/api/log-to-0g', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ogLogData)
+      });
+      return res.json().catch(() => ({ success: false, error: 'Invalid JSON from logger API' }));
+    };
+
+    (async () => {
+      let ogResult;
+      try {
+        ogResult = await postLog();
+        if (!ogResult?.success) {
+          // brief retry once
+          await new Promise(r => setTimeout(r, 1200));
+          ogResult = await postLog();
+        }
+      } catch (e) {
+        ogResult = { success: false, error: e?.message || 'Network error' };
+      }
+
       console.log('🔮 0G Network logging result:', ogResult);
       if (ogResult.success) {
         console.log('✅ Game result logged to 0G Network:', ogResult.transactionHash);
-        
-        // Store 0G transaction hash for later retrieval
         localStorage.setItem(`og_log_${data.data.gameResult.id}`, JSON.stringify({
           transactionHash: ogResult.transactionHash,
           blockNumber: ogResult.blockNumber,
           explorerUrl: ogResult.explorerUrl,
           timestamp: Date.now()
         }));
-        
-        // Trigger a page refresh or state update to show the button
-        window.dispatchEvent(new CustomEvent('ogLogCompleted', { 
-          detail: { gameId: data.data.gameResult.id } 
-        }));
+        window.dispatchEvent(new CustomEvent('ogLogCompleted', { detail: { gameId: data.data.gameResult.id } }));
       } else {
         console.warn('⚠️ Failed to log to 0G Network:', ogResult.error);
-        
-        // Store failed attempt info
         localStorage.setItem(`og_log_${data.data.gameResult.id}`, JSON.stringify({
           transactionHash: null,
           error: ogResult.error,
           timestamp: Date.now(),
           failed: true
         }));
+        // Notify UI so it can stop spinning
+        window.dispatchEvent(new CustomEvent('ogLogCompleted', { detail: { gameId: data.data.gameResult.id, failed: true } }));
       }
-    })
-    .catch(error => {
-      console.error('❌ 0G Network logging error:', error);
-      
-      // Store error info
-      localStorage.setItem(`og_log_${data.data.gameResult.id}`, JSON.stringify({
-        transactionHash: null,
-        error: error.message,
-        timestamp: Date.now(),
-        failed: true
-      }));
-    });
+    })();
 
     return {
       success: true,
@@ -145,7 +141,28 @@ export const saveGameResult = async (gameData) => {
 export const getOGNetworkLog = (gameId) => {
   try {
     const logData = localStorage.getItem(`og_log_${gameId}`);
-    if (!logData) return null;
+    if (!logData) {
+      // Fallback: pick most recent successful 0G log from last 90 seconds
+      try {
+        let latest = null;
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('og_log_')) {
+            const raw = localStorage.getItem(key);
+            const parsed = JSON.parse(raw || '{}');
+            if (!parsed?.failed && parsed?.transactionHash && parsed?.timestamp) {
+              if (!latest || parsed.timestamp > latest.timestamp) {
+                latest = parsed;
+              }
+            }
+          }
+        }
+        if (latest && Date.now() - latest.timestamp < 90000) {
+          return latest;
+        }
+      } catch (_) {}
+      return null;
+    }
     
     const parsed = JSON.parse(logData);
     

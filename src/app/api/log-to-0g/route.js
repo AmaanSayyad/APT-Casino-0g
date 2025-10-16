@@ -4,6 +4,10 @@ import { TREASURY_CONFIG } from '@/config/treasury.js';
 
 export async function POST(request) {
   try {
+    // Validate server-side config
+    if (!TREASURY_CONFIG?.PRIVATE_KEY || TREASURY_CONFIG.PRIVATE_KEY.length < 10) {
+      return NextResponse.json({ success: false, error: 'Treasury private key missing on server' }, { status: 503 });
+    }
     const gameData = await request.json();
     
     console.log('📝 0G LOGGER API: Received game data:', {
@@ -105,16 +109,52 @@ export async function POST(request) {
       gasLimit: 100000
     });
 
-    // Send transaction with game data
+    // Build and send transaction with robust gas/nonce handling
     let tx;
     try {
-      tx = await treasuryWallet.sendTransaction({
-        to: treasuryWallet.address, // Send to self to log data
-        value: 0, // No value transfer, just data logging
+      const fromAddress = treasuryWallet.address;
+      // Estimate gas for data transaction
+      let gasLimit;
+      try {
+        gasLimit = await provider.estimateGas({ from: fromAddress, to: fromAddress, data: dataHex });
+      } catch (_) {
+        gasLimit = 100000n; // fallback
+      }
+
+      // Get fee data and nonce
+      const feeData = await provider.getFeeData();
+      const nonce = await provider.getTransactionCount(fromAddress, 'latest');
+      const network = await provider.getNetwork();
+
+      const txRequestBase = {
+        to: fromAddress,
+        value: 0,
         data: dataHex,
-        gasLimit: 100000 // Sufficient gas for data transaction
-      });
-      
+        gasLimit,
+        nonce,
+        chainId: Number(network.chainId)
+      };
+
+      let txRequest;
+      if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+        // EIP-1559 style
+        txRequest = {
+          ...txRequestBase,
+          type: 2,
+          maxFeePerGas: feeData.maxFeePerGas,
+          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+        };
+      } else {
+        // Legacy gas price fallback
+        const legacyGasPrice = feeData.gasPrice || ethers.parseUnits('1', 'gwei');
+        txRequest = {
+          ...txRequestBase,
+          type: 0,
+          gasPrice: legacyGasPrice
+        };
+      }
+
+      tx = await treasuryWallet.sendTransaction(txRequest);
       console.log('📤 0G LOGGER API: Transaction sent successfully:', tx.hash);
     } catch (txError) {
       console.error('❌ 0G LOGGER API: Transaction failed:', txError);
@@ -160,6 +200,9 @@ export async function POST(request) {
 // GET endpoint to check 0G Network status
 export async function GET() {
   try {
+    if (!TREASURY_CONFIG?.PRIVATE_KEY || TREASURY_CONFIG.PRIVATE_KEY.length < 10) {
+      return NextResponse.json({ success: false, error: 'Treasury private key missing on server', status: 'error' }, { status: 503 });
+    }
     const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai';
     const provider = new ethers.JsonRpcProvider(ogRpcUrl);
     const treasuryWallet = new ethers.Wallet(TREASURY_CONFIG.PRIVATE_KEY, provider);
@@ -195,3 +238,8 @@ export async function GET() {
     }, { status: 500 });
   }
 }
+
+// Ensure Node.js runtime and no caching for this route
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;

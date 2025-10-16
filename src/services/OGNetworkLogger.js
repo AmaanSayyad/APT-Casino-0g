@@ -87,13 +87,48 @@ class OGNetworkLogger {
       const dataString = JSON.stringify(logData);
       const dataHex = ethers.hexlify(ethers.toUtf8Bytes(dataString));
 
-      // Send transaction with game data
-      const tx = await this.treasuryWallet.sendTransaction({
-        to: this.treasuryWallet.address, // Send to self to log data
-        value: 0, // No value transfer, just data logging
+      // Build and send transaction with robust gas/nonce handling
+      const fromAddress = this.treasuryWallet.address;
+      // Estimate gas for data transaction
+      let gasLimit;
+      try {
+        gasLimit = await this.provider.estimateGas({ from: fromAddress, to: fromAddress, data: dataHex });
+      } catch (_) {
+        gasLimit = 100000n; // fallback
+      }
+
+      // Get fee data and nonce
+      const feeData = await this.provider.getFeeData();
+      const nonce = await this.provider.getTransactionCount(fromAddress, 'latest');
+      const network = await this.provider.getNetwork();
+
+      const txRequestBase = {
+        to: fromAddress,
+        value: 0,
         data: dataHex,
-        gasLimit: 100000 // Sufficient gas for data transaction
-      });
+        gasLimit,
+        nonce,
+        chainId: Number(network.chainId)
+      };
+
+      let tx;
+      if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+        // EIP-1559 style
+        tx = await this.treasuryWallet.sendTransaction({
+          ...txRequestBase,
+          type: 2,
+          maxFeePerGas: feeData.maxFeePerGas,
+          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+        });
+      } else {
+        // Legacy gas price fallback
+        const legacyGasPrice = feeData.gasPrice || ethers.parseUnits('1', 'gwei');
+        tx = await this.treasuryWallet.sendTransaction({
+          ...txRequestBase,
+          type: 0,
+          gasPrice: legacyGasPrice
+        });
+      }
 
       console.log('📤 0G LOGGER: Transaction sent:', tx.hash);
 

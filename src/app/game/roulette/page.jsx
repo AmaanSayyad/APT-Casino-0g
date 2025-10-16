@@ -35,6 +35,7 @@ import { useAccount } from 'wagmi';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBalance, setLoading, loadBalanceFromStorage } from '@/store/balanceSlice';
 import pythEntropyService from '@/services/PythEntropyService';
+import { useGameHistory } from '@/hooks/useGameHistory';
 
 // Ethereum client functions will be added here when needed
 
@@ -1192,6 +1193,7 @@ export default function GameRoulette() {
 
   // Ethereum wallet
   const { address, isConnected } = useAccount();
+  const { saveRouletteGame } = useGameHistory();
   const account = { address };
   const connected = isConnected;
   const isWalletReady = isConnected && address;
@@ -2065,6 +2067,21 @@ export default function GameRoulette() {
           
           // Pyth Entropy handles randomness generation
           console.log('✅ Pyth Entropy randomness processed for Roulette');
+          // Save to history -> triggers 0G logging via API
+          try {
+            saveRouletteGame({
+              userAddress: address,
+              vrfRequestId: newBet?.entropyProof?.requestId,
+              vrfTransactionHash: newBet?.entropyProof?.transactionHash,
+              vrfValue: newBet?.entropyProof?.randomValue,
+              gameConfig: { betType: 'multiple', betValue: winningNumber, wheelType: 'european' },
+              resultData: { number: winningNumber, color: null, properties: {}, ...newBet },
+              betAmount: totalBetAmount.toString(),
+              payoutAmount: netResult.toString()
+            }).then((r) => console.log('💾 Roulette saved to history (triggers 0G):', r)).catch((e) => console.warn('Save history failed:', e));
+          } catch (e) {
+            console.warn('saveRouletteGame threw:', e);
+          }
         }).then(() => {
           console.log('📊 PYTH ENTROPY: Roulette game completed successfully');
         }).catch(error => {
