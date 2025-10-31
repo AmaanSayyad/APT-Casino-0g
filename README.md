@@ -184,13 +184,19 @@ sequenceDiagram
 
     UI->>U: Update UI + balances
 ```
+## Business Model
+<img width="1532" height="967" alt="Screenshot 2025-10-31 at 7 15 55 PM" src="https://github.com/user-attachments/assets/cb10f2a9-75e2-4b2c-871b-c35af61eaa76" />
 
 ## 🗺 Roadmap
+<img width="1710" height="967" alt="Screenshot 2025-10-31 at 7 16 07 PM" src="https://github.com/user-attachments/assets/b3375731-3d46-4e4e-81c2-5a9d6e57be47" />
+
 
 - Expand game catalog and volatility profiles
 - In-app tournaments and prizes (Livepeer streams + leaderboards)
 - Deeper 0G integrations (DA, performance, data indexing)
 - SDK for third-party game devs
+- ROI Share Links: Shareable proof-links for withdrawals that render dynamic cards on social platforms
+- Developer Platform: Allowing third-party games and acting as a gambling launchpad/ hub for games.
 
 ## 📣 Links
 
