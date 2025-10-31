@@ -2,8 +2,15 @@
 const nextConfig = {
   transpilePackages: ['three'],
   images: {
-    domains: ['images.unsplash.com'],
-    unoptimized: true, // Disable Next.js image optimization for Vercel
+    domains: ['images.unsplash.com', 'localhost'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+    // Only disable optimization if you're having issues, otherwise remove this line
+    unoptimized: process.env.NODE_ENV === 'development' ? false : true,
   },
   // Performance optimizations
   poweredByHeader: false,

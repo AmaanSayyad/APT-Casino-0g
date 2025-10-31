@@ -18,6 +18,16 @@ body {
   box-sizing: border-box;
 }
 
+/* Font loading states */
+html:not(.fonts-loaded) {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Smooth transition when fonts load */
+html.fonts-loaded {
+  transition: font-family 0.3s ease;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;

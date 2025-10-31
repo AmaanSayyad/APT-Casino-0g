@@ -1,12 +1,9 @@
-import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import Providers from "./providers";
 import Navbar from "@/components/Navbar.js";
 import Footer from "@/components/Footer";
 import GlobalWalletManager from "@/components/GlobalWalletManager";
-
-
-const inter = Inter({ subsets: ["latin"] });
+import FontLoader from "@/components/FontLoader";
 
 export const metadata = {
   title: "APT Casino",
@@ -26,17 +23,18 @@ export default function RootLayout({ children }) {
         />
         <link
           rel="preload"
-          href="/fonts/PlusJakartaSans VariableFont.woff2"
+          href="/fonts/PlusJakartaSans-VariableFont.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
         />
       </head>
       <body 
-        className={`${inter.className} overflow-x-hidden w-full`}
+        className="font-sans overflow-x-hidden w-full"
         suppressHydrationWarning={true}
       >
         <Providers>
+          <FontLoader />
           <GlobalWalletManager />
           <Navbar />
           {children}
