@@ -155,6 +155,70 @@ graph LR
     E --> H
 ```
 
+## 🎮 Game Execution Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as User
+    participant UI as Game UI (Next.js)
+    participant API as Next.js API Route
+    participant OG as 0G Network (Game Tx)
+    participant AE as Arbitrum Sepolia (Entropy)
+    participant PE as Pyth Entropy
+    participant DB as Postgres
+    participant RD as Redis
+
+    U->>UI: Place bet / select game
+    UI->>OG: Submit bet tx (treasury-sponsored)
+    OG-->>UI: Tx confirmed (receipt)
+
+    UI->>API: POST /api/entropy/request
+    API->>AE: call Consumer.request(userSeed)
+    AE->>PE: request entropy
+    PE-->>AE: entropyCallback(proof)
+    AE-->>API: event (EntropyFulfilled)
+    API->>DB: persist result, audit trail
+    API->>RD: cache balances, leaderboard
+    API-->>UI: result payload (win/lose, payout)
+
+    UI->>U: Update UI + balances
+```
+
+## 🌐 Deployment & Networks
+
+```mermaid
+graph TB
+    subgraph Client[User]
+        B[Browser]
+    end
+    subgraph Edge[CDN/Edge]
+        C[Vercel Edge]
+    end
+    subgraph App[Next.js App]
+        N[App Router + API Routes]
+    end
+    subgraph Chains[Networks]
+        OG[0G Testnet - Gameplay]
+        ARB[Arbitrum Sepolia - Entropy]
+        PY[\nPyth Entropy\n]
+    end
+    subgraph Data[Data & Realtime]
+        PG[(PostgreSQL)]
+        RS[(Redis Cache)]
+        LP[Livepeer Streaming]
+        SB[Supabase Realtime]
+    end
+
+    B --> C --> N
+    N --> OG
+    N --> ARB --> PY
+    N --> PG
+    N --> RS
+    N --> LP
+    N --> SB
+```
+
 ## 🗺 Roadmap
 
 - Expand game catalog and volatility profiles
