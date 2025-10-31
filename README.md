@@ -185,40 +185,6 @@ sequenceDiagram
     UI->>U: Update UI + balances
 ```
 
-## 🌐 Deployment & Networks
-
-```mermaid
-graph TB
-    subgraph Client[User]
-        B[Browser]
-    end
-    subgraph Edge[CDN/Edge]
-        C[Vercel Edge]
-    end
-    subgraph App[Next.js App]
-        N[App Router + API Routes]
-    end
-    subgraph Chains[Networks]
-        OG[0G Testnet - Gameplay]
-        ARB[Arbitrum Sepolia - Entropy]
-        PY[\nPyth Entropy\n]
-    end
-    subgraph Data[Data & Realtime]
-        PG[(PostgreSQL)]
-        RS[(Redis Cache)]
-        LP[Livepeer Streaming]
-        SB[Supabase Realtime]
-    end
-
-    B --> C --> N
-    N --> OG
-    N --> ARB --> PY
-    N --> PG
-    N --> RS
-    N --> LP
-    N --> SB
-```
-
 ## 🗺 Roadmap
 
 - Expand game catalog and volatility profiles
