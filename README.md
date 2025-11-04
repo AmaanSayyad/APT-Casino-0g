@@ -57,7 +57,8 @@ The traditional online gambling industry is plagued by several issues, including
 - **State**: Redux Toolkit + React Query
 - **Social**: Livepeer for streaming, Supabase for real-time chat
 - **Data**: PostgreSQL + Redis
-- **Data Availability**: 0G DA (game history, audit trails)
+- **Data Availability**: 0G DA (game history, audit trails) - [Integration Guide](./0G_DA_INTEGRATION.md)
+- **Storage**: 0G Storage (game assets, user profiles, backups) - [Integration Guide](./0G_STORAGE_INTEGRATION.md)
 
 ## 🔗 Networks
 
@@ -89,6 +90,7 @@ NEXT_PUBLIC_NETWORK="0G_TESTNET"
 NEXT_PUBLIC_RPC_URL="<YOUR_0G_RPC_URL>"
 NEXT_PUBLIC_ENTROPY_CHAIN_ID="421614" # Arbitrum Sepolia
 NEXT_PUBLIC_0G_DA_CLIENT_URL="http://localhost:51001" # 0G DA Client
+NEXT_PUBLIC_0G_STORAGE_INDEXER_RPC="https://indexer-storage-testnet-turbo.0g.ai" # 0G Storage Indexer
 NEXT_PUBLIC_LIVEPEER_API_KEY="<LIVEPEER_API_KEY>"
 DATABASE_URL="<POSTGRES_URL>"
 REDIS_URL="<REDIS_URL>"
@@ -102,6 +104,11 @@ TREASURY_PRIVATE_KEY="<TREASURY_PRIVATE_KEY>"
 - `npm start` – start production server
 - `npm run lint` – lint
 - `npm run test:og-da` – test 0G DA integration
+- `npm run test:og-storage` – test 0G Storage integration
+
+## 🏗 System Architecture (Mermaid)
+
+**For detailed 0G integration architecture, see:** [0G Integration Architecture](./0G_INTEGRATION_ARCHITECTURE.md)
 
 ## 🏗 System Architecture (Mermaid)
 
@@ -114,6 +121,7 @@ graph TB
         B --> E[RainbowKit]
         B --> LS[Livepeer Streaming]
         B --> CC[On-chain Chat]
+        B --> AI[AI Assistant]
     end
     subgraph State["State Management"]
         F[Redux Toolkit] --> G[React Query]
@@ -123,9 +131,19 @@ graph TB
         I --> L[Game Logic]
         I --> SC[Socket/Realtime]
         I --> LP[Livepeer API]
+        I --> OGComputeAPI[0G Compute API]
+        I --> OGStorageAPI[0G Storage API]
+        I --> OGDAAPI[0G DA API]
+    end
+    subgraph OG["0G Ecosystem"]
+        OGChain[0G Chain<br/>Galileo Testnet]
+        OGCompute[0G Compute<br/>AI Inference]
+        OGStorage[0G Storage<br/>File Storage]
+        OGDA[0G DA<br/>Data Availability]
     end
     subgraph 0GNet["Gaming Network — 0G Testnet"]
-        OG[0G] --> DEP[Deposits/Withdrawals]
+        OGChain --> DEP[Deposits/Withdrawals]
+        OGChain --> Contracts[Smart Contracts]
     end
     subgraph Entropy["Entropy Network — Arbitrum Sepolia"]
         AS[Arbitrum Sepolia] --> N[Entropy Consumer]
@@ -137,10 +155,17 @@ graph TB
     end
     A --> F
     B --> I
+    AI --> OGComputeAPI
     I --> OG
     I --> AS
     I --> Q
     I --> S
+    OGComputeAPI --> OGCompute
+    OGStorageAPI --> OGStorage
+    OGDAAPI --> OGDA
+    OGCompute --> OGChain
+    OGStorage --> OGChain
+    OGDA --> OGChain
 ```
 
 ## 🎲 Pyth Entropy Flow
@@ -201,6 +226,7 @@ sequenceDiagram
 - In-app tournaments and prizes (Livepeer streams + leaderboards)
 - ✅ 0G DA integration (game history, audit trails) - [Setup Guide](./0G_DA_SETUP_GUIDE.md)
 - ✅ 0G Compute Network integration (AI assistant)
+- ✅ 0G Storage integration (game assets, user profiles) - [Integration Guide](./0G_STORAGE_INTEGRATION.md)
 - Performance optimization and data indexing
 - SDK for third-party game devs
 - ROI Share Links: Shareable proof-links for withdrawals that render dynamic cards on social platforms

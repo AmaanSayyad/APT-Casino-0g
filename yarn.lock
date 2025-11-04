@@ -41,6 +41,15 @@
     stream-browserify "^3.0.0"
     util "^0.12.5"
 
+"@0glabs/0g-ts-sdk@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.npmjs.org/@0glabs/0g-ts-sdk/-/0g-ts-sdk-0.3.3.tgz"
+  integrity sha512-Ug/9gdeBnmTYU6obPXWChD8XqNUSyOI53vWWsbK2IXNymQc84gd1cDneQ2Vz2AZP26290pIp5FgmNgkVNOyxIA==
+  dependencies:
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/keccak256" "^5.7.0"
+    open-jsonrpc-provider "^0.2.1"
+
 "@adraffy/ens-normalize@^1.10.1", "@adraffy/ens-normalize@^1.11.0":
   version "1.11.0"
   resolved "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.11.0.tgz"
