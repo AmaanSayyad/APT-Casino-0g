@@ -117,6 +117,36 @@ export const saveGameResult = async (gameData) => {
 
     console.log('🔮 0G Network logging result:', ogResult);
     
+    // Submit to 0G DA (optional, async, don't block)
+    let daResult = null;
+    try {
+      const daResponse = await fetch('/api/og-da/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: JSON.stringify(ogLogData),
+          options: {
+            compress: true,
+            metadata: {
+              gameType: gameType,
+              gameId: gameId,
+              source: 'casino_game_result'
+            }
+          }
+        })
+      }).catch(() => null);
+      
+      if (daResponse && daResponse.ok) {
+        daResult = await daResponse.json().catch(() => null);
+        if (daResult?.success) {
+          console.log('✅ Game result submitted to 0G DA:', daResult.blobHash);
+        }
+      }
+    } catch (daError) {
+      console.warn('⚠️ Failed to submit to 0G DA (non-critical):', daError.message);
+      // Don't fail the whole operation if DA submission fails
+    }
+    
     // Add 0G transaction info to the result
     const finalResult = {
       success: true,
@@ -131,6 +161,11 @@ export const saveGameResult = async (gameData) => {
         failed: true,
         error: ogResult.error
       },
+      ogDALog: daResult?.success ? {
+        blobHash: daResult.blobHash,
+        dataRoot: daResult.dataRoot,
+        submitted: true
+      } : null,
       message: 'Game result saved with VRF verification and 0G Network logging'
     };
 

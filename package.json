@@ -27,7 +27,8 @@
     "deploy:pyth-entropy": "npx hardhat run scripts/deploy-pyth-entropy.js --network arbitrum-sepolia",
     "deploy:pyth-entropy:mainnet": "npx hardhat run scripts/deploy-pyth-entropy.js --network arbitrum-one",
     "test:pyth-entropy": "node scripts/test-pyth-entropy.js",
-    "verify:onchain": "npx hardhat run scripts/verify-onchain.js --network arbitrum-sepolia"
+    "verify:onchain": "npx hardhat run scripts/verify-onchain.js --network arbitrum-sepolia",
+    "test:og-da": "node scripts/test-og-da.js"
   },
   "dependencies": {
     "@0glabs/0g-serving-broker": "^0.5.4",
@@ -35,6 +36,8 @@
     "@emotion/is-prop-valid": "^1.3.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@grpc/grpc-js": "^1.14.0",
+    "@grpc/proto-loader": "^0.8.0",
     "@livepeer/react": "^4.3.6",
     "@mui/icons-material": "^5.15.18",
     "@mui/lab": "^5.0.0-alpha.170",

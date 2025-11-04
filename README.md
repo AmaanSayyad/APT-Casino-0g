@@ -57,11 +57,13 @@ The traditional online gambling industry is plagued by several issues, including
 - **State**: Redux Toolkit + React Query
 - **Social**: Livepeer for streaming, Supabase for real-time chat
 - **Data**: PostgreSQL + Redis
+- **Data Availability**: 0G DA (game history, audit trails)
 
 ## 🔗 Networks
 
 - **Gaming / App Network**: 0G Network (testnet)
 - **Entropy / RNG**: Arbitrum Sepolia (Pyth Entropy)
+- **Data Availability**: 0G DA (for game history and audit trails)
 
 ## 🎮 Games
 
@@ -86,9 +88,11 @@ Environment variables (example):
 NEXT_PUBLIC_NETWORK="0G_TESTNET"
 NEXT_PUBLIC_RPC_URL="<YOUR_0G_RPC_URL>"
 NEXT_PUBLIC_ENTROPY_CHAIN_ID="421614" # Arbitrum Sepolia
+NEXT_PUBLIC_0G_DA_CLIENT_URL="http://localhost:51001" # 0G DA Client
 NEXT_PUBLIC_LIVEPEER_API_KEY="<LIVEPEER_API_KEY>"
 DATABASE_URL="<POSTGRES_URL>"
 REDIS_URL="<REDIS_URL>"
+TREASURY_PRIVATE_KEY="<TREASURY_PRIVATE_KEY>"
 ```
 
 ## 🧪 Commands
@@ -97,6 +101,7 @@ REDIS_URL="<REDIS_URL>"
 - `npm run build` – production build
 - `npm start` – start production server
 - `npm run lint` – lint
+- `npm run test:og-da` – test 0G DA integration
 
 ## 🏗 System Architecture (Mermaid)
 
@@ -194,7 +199,9 @@ sequenceDiagram
 
 - Expand game catalog and volatility profiles
 - In-app tournaments and prizes (Livepeer streams + leaderboards)
-- Deeper 0G integrations (DA, performance, data indexing)
+- ✅ 0G DA integration (game history, audit trails) - [Setup Guide](./0G_DA_SETUP_GUIDE.md)
+- ✅ 0G Compute Network integration (AI assistant)
+- Performance optimization and data indexing
 - SDK for third-party game devs
 - ROI Share Links: Shareable proof-links for withdrawals that render dynamic cards on social platforms
 - Developer Platform: Allowing third-party games and acting as a gambling launchpad/ hub for games.
