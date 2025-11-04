@@ -1,5 +1,5 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config({ path: '.env.local' });
+require('@nomicfoundation/hardhat-toolbox');
+require('dotenv').config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -8,44 +8,33 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
-      },
-    },
+        runs: 200
+      }
+    }
   },
   networks: {
-    'arbitrum-sepolia': {
-      url: process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC || "https://sepolia-rollup.arbitrum.io/rpc",
-      accounts: ["0x080c0b0dc7aa27545fab73d29b06f33e686d1491aef785bf5ced325a32c14506"],
-      chainId: 421614,
-      timeout: 120000, // 2 minutes
-      httpHeaders: {
-        "User-Agent": "hardhat"
-      }
-    },
-    'arbitrum-one': {
-      url: process.env.NEXT_PUBLIC_ARBITRUM_ONE_RPC || "https://arb1.arbitrum.io/rpc",
+    "0g-galileo": {
+      url: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || "https://evmrpc-testnet.0g.ai",
       accounts: process.env.TREASURY_PRIVATE_KEY ? [process.env.TREASURY_PRIVATE_KEY] : [],
-      chainId: 42161,
-      timeout: 120000,
-      httpHeaders: {
-        "User-Agent": "hardhat"
-      }
-    },
-    localhost: {
-      url: "http://127.0.0.1:8545",
-      chainId: 31337,
-    },
+      chainId: 16602,
+      gasPrice: 3000000000, // 3 gwei
+      gas: 8000000,
+      type: 0 // Legacy transaction
+    }
   },
   etherscan: {
     apiKey: {
-      arbitrumSepolia: process.env.ARBISCAN_API_KEY || "",
-      arbitrumOne: process.env.ARBISCAN_API_KEY || "",
+      "0g-galileo": "no-api-key-needed"
     },
-  },
-  paths: {
-    sources: "./contracts",
-    tests: "./test",
-    cache: "./cache",
-    artifacts: "./artifacts",
-  },
+    customChains: [
+      {
+        network: "0g-galileo",
+        chainId: 16602,
+        urls: {
+          apiURL: "https://chainscan-galileo.0g.ai/api",
+          browserURL: "https://chainscan-galileo.0g.ai"
+        }
+      }
+    ]
+  }
 };

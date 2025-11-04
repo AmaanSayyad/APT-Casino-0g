@@ -78,6 +78,23 @@ export const saveGameResult = async (gameData) => {
     console.log('🔮 Starting 0G Network logging for game:', gameId);
 
     const postLog = async () => {
+      // Try contract logger first, fallback to transaction logger
+      const contractRes = await fetch('/api/log-to-0g-contract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ogLogData)
+      }).catch(() => null);
+      
+      if (contractRes && contractRes.ok) {
+        const contractResult = await contractRes.json().catch(() => null);
+        if (contractResult && contractResult.success) {
+          console.log('✅ Used contract logger successfully');
+          return contractResult;
+        }
+      }
+      
+      // Fallback to transaction logger
+      console.log('⚠️ Contract logger failed, using transaction logger as fallback');
       const res = await fetch('/api/log-to-0g', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
