@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Loading Debug</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .font-test {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #444;
+        }
+        @font-face {
+            font-family: 'ClashDisplay-Test';
+            src: url('/fonts/ClashDisplay-Variable.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'PlusJakarta-Test';
+            src: url('/fonts/PlusJakartaSans-VariableFont.woff2') format('woff2');
+        }
+        .clash-test { font-family: 'ClashDisplay-Test', sans-serif; }
+        .jakarta-test { font-family: 'PlusJakarta-Test', sans-serif; }
+    </style>
+</head>
+<body>
+    <h1>Asset Loading Debugger</h1>
+    
+    <div class="test-section">
+        <h2>Font Loading Tests</h2>
+        <div id="font-tests"></div>
+        <div class="font-test clash-test">
+            This text should be in ClashDisplay font
+        </div>
+        <div class="font-test jakarta-test">
+            This text should be in Plus Jakarta Sans font
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Image Loading Tests</h2>
+        <div id="image-tests"></div>
+    </div>
+    
+    <script>
+        // Test font loading
+        const fontTests = document.getElementById('font-tests');
+        const fonts = [
+            '/fonts/ClashDisplay-Variable.woff2',
+            '/fonts/ClashDisplay-Bold.woff2',
+            '/fonts/PlusJakartaSans-VariableFont.woff2',
+            '/fonts/PlusJakartaSans-Italic-Variable.woff2'
+        ];
+        
+        fonts.forEach(async (fontUrl) => {
+            try {
+                const response = await fetch(fontUrl);
+                const status = response.ok ? 'success' : 'error';
+                fontTests.innerHTML += `<div class="${status}">
+                    ${fontUrl}: ${response.status} ${response.statusText}
+                </div>`;
+            } catch (error) {
+                fontTests.innerHTML += `<div class="error">
+                    ${fontUrl}: Failed to load - ${error.message}
+                </div>`;
+            }
+        });
+        
+        // Test image loading
+        const imageTests = document.getElementById('image-tests');
+        const images = [
+            '/logo.png',
+            '/images/HeroImage.png',
+            '/images/games/plinko.png',
+            '/coin.png'
+        ];
+        
+        images.forEach((imgUrl) => {
+            const img = new Image();
+            img.onload = () => {
+                imageTests.innerHTML += `<div class="success">
+                    ${imgUrl}: Loaded successfully
+                </div>`;
+            };
+            img.onerror = () => {
+                imageTests.innerHTML += `<div class="error">
+                    ${imgUrl}: Failed to load
+                </div>`;
+            };
+            img.src = imgUrl;
+        });
+        
+        // Check font loading API
+        if ('fonts' in document) {
+            document.fonts.ready.then(() => {
+                fontTests.innerHTML += '<div class="success">Font Loading API: Ready</div>';
+                document.fonts.forEach((font) => {
+                    fontTests.innerHTML += `<div>Loaded: ${font.family} - ${font.status}</div>`;
+                });
+            });
+        } else {
+            fontTests.innerHTML += '<div class="error">Font Loading API: Not supported</div>';
+        }
+    </script>
+</body>
+</html>
