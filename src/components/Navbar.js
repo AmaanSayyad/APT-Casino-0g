@@ -11,6 +11,7 @@ import { setBalance, setLoading, loadBalanceFromStorage } from '@/store/balanceS
 import EthereumConnectWalletButton from "./EthereumConnectWalletButton";
 import WithdrawModal from "./WithdrawModal";
 import LiveChat from "./LiveChat";
+import AiModal from "./AiModal";
 import { useGlobalWalletPersistence } from '../hooks/useGlobalWalletPersistence';
 
 
@@ -122,6 +123,7 @@ export default function Navbar() {
   const [depositAmount, setDepositAmount] = useState("");
   const [isDepositing, setIsDepositing] = useState(false);
   const [showLiveChat, setShowLiveChat] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
 
 
   // Wallet connection with persistence
@@ -1004,6 +1006,17 @@ export default function Navbar() {
               </div>
             )}
             
+            {/* AI Assistant Button */}
+            <button
+              onClick={() => setShowAiModal(true)}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              AI Assistant
+            </button>
+            
             {/* Live Chat Button */}
             <button
               onClick={() => setShowLiveChat(true)}
@@ -1249,6 +1262,9 @@ export default function Navbar() {
         open={showLiveChat}
         onClose={() => setShowLiveChat(false)}
       />
+      
+      {/* AI Modal */}
+      <AiModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
       
     </>
   );
