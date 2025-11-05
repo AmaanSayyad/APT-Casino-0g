@@ -1,5 +1,8 @@
 ## APT-Casino 
 
+### Demo Video: https://youtu.be/S3N7Us6uZdA
+### 0g Storage, 0g Compute, 0g DA Integration Video: https://www.youtube.com/watch?v=DMvrNK7nMBo
+ 
 A couple of days back, I was was on etherscan exploring some transactions and saw an advertisement of https://stake.com/ which was giving 200% bonus on first deposit, I deposited 120 USDT into stake.com they gave 360 USDT as total balance in their controlled custodial wallet and when I started playing casino games I was shocked to see that I was only able to play with $1 per game and was unable to increase the betting amount beyond $1 coz and when I tried to explore and play other games on the platform the issue was persisting, I reached the customer support and got to know that this platform has cheated him under the name of wager limits as I was using the bonus scheme of 200%.
 
 When I asked the customer support to withdraw money they showed a rule list of wager limit, which said that if I wanted to withdraw the deposited amount, then I have to play $12,300 worth of gameplay and this was a big shock for me, as I was explained a maths logic by their live support. Thereby, In the hope of getting the deposited money back, I played the different games of stake.com like roulette, mines, spin wheel, etc, the entire night and lost all the money.
@@ -50,6 +53,12 @@ The traditional online gambling industry is plagued by several issues, including
 
 ## 🧩 Architecture
 <img width="1552" height="725" alt="Screenshot 2025-10-31 at 5 19 09 PM" src="https://github.com/user-attachments/assets/20f99b78-d9e2-421a-ad50-53cf19850d03" />
+
+### 0g Storage, 0g DA Architecture
+![WhatsApp Image 2025-11-05 at 02 08 05](https://github.com/user-attachments/assets/369c3acb-3bab-427f-a931-d638fcd6651f)
+
+### 0g Compute Architecture
+![WhatsApp Image 2025-11-05 at 02 08 23](https://github.com/user-attachments/assets/1f3df080-6b92-4d95-a6ff-3fd79689ce22)
 
 - **Frontend**: Next.js (App Router), React 18, Tailwind, MUI, Three.js
 - **Wallet/Chain**: wagmi + RainbowKit
@@ -234,6 +243,7 @@ sequenceDiagram
 
 ## 📣 Links
 
-- Live (Vercel): https://apt-casino-0g.vercel.app/ 
-- Demo video: 
-- Pitch/Slides: https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1 
+- **Live (Vercel):** https://apt-casino-0g.vercel.app/ 
+- **Pitch/Slides:** https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1 
+- **Demo Video:** https://youtu.be/S3N7Us6uZdA
+- **0g Storage, 0g Compute, 0g DA Integration Video:** https://www.youtube.com/watch?v=DMvrNK7nMBo
