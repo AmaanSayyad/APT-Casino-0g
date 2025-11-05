@@ -13,6 +13,14 @@ module.exports = {
     }
   },
   networks: {
+    "0g-mainnet": {
+      url: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || "https://evmrpc.0g.ai",
+      accounts: process.env.TREASURY_PRIVATE_KEY ? [process.env.TREASURY_PRIVATE_KEY] : [],
+      chainId: 16661,
+      gasPrice: 3000000000, // 3 gwei
+      gas: 8000000,
+      type: 0 // Legacy transaction
+    },
     "0g-galileo": {
       url: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || "https://evmrpc-testnet.0g.ai",
       accounts: process.env.TREASURY_PRIVATE_KEY ? [process.env.TREASURY_PRIVATE_KEY] : [],

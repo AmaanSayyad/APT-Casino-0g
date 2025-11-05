@@ -12,12 +12,12 @@ class OGNetworkLogger {
     this.treasuryWallet = null;
     this.isInitialized = false;
     
-    // 0G Network configuration
+    // 0G Network configuration - MAINNET
     this.networkConfig = {
-      chainId: 16602,
-      name: '0G-Galileo-Testnet',
-      rpcUrl: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai',
-      explorerUrl: process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan-galileo.0g.ai'
+      chainId: 16661,
+      name: '0G-Mainnet',
+      rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
+      explorerUrl: process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER || 'https://chainscan.0g.ai'
     };
   }
 
@@ -145,7 +145,7 @@ class OGNetworkLogger {
         blockNumber: receipt.blockNumber,
         explorerUrl: `${this.networkConfig.explorerUrl}/tx/${tx.hash}`,
         logData: logData,
-        network: '0g-galileo-testnet'
+        network: '0g-mainnet'
       };
 
     } catch (error) {
@@ -159,7 +159,7 @@ class OGNetworkLogger {
         blockNumber: null,
         explorerUrl: null,
         logData: null,
-        network: '0g-galileo-testnet'
+        network: '0g-mainnet'
       };
     }
   }

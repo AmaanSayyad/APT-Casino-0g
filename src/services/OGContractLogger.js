@@ -23,16 +23,16 @@ class OGContractLogger {
     this.contract = null;
     this.isInitialized = false;
     
-    // 0G Network configuration
+    // 0G Network configuration - MAINNET
     this.networkConfig = {
-      chainId: 16602,
-      name: '0G-Galileo-Testnet',
-      rpcUrl: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai',
-      explorerUrl: process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan-galileo.0g.ai'
+      chainId: 16661,
+      name: '0G-Mainnet',
+      rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
+      explorerUrl: process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER || 'https://chainscan.0g.ai'
     };
     
-    // Contract address (will be set after deployment)
-    this.contractAddress = process.env.NEXT_PUBLIC_GAME_LOGGER_CONTRACT || null;
+    // Contract address (mainnet will be set after deployment)
+    this.contractAddress = process.env.NEXT_PUBLIC_GAME_LOGGER_CONTRACT_MAINNET || null;
   }
 
   /**
@@ -195,7 +195,7 @@ class OGContractLogger {
         explorerUrl: `${this.networkConfig.explorerUrl}/tx/${tx.hash}`,
         contractAddress: this.contractAddress,
         eventData: eventData,
-        network: '0g-galileo-testnet'
+        network: '0g-mainnet'
       };
 
     } catch (error) {
@@ -209,7 +209,7 @@ class OGContractLogger {
         blockNumber: null,
         explorerUrl: null,
         contractAddress: this.contractAddress,
-        network: '0g-galileo-testnet'
+        network: '0g-mainnet'
       };
     }
   }

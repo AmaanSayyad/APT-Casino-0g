@@ -5,8 +5,8 @@ import PYTH_ENTROPY_CONFIG from '@/config/pythEntropy.js';
 
 export async function GET() {
   try {
-    // Check balance on 0G Network (for deposit/withdraw)
-    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai';
+    // Check balance on 0G Network MAINNET (for deposit/withdraw)
+    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai';
     const ogProvider = new JsonRpcProvider(ogRpcUrl);
     
     // Also check Arbitrum Sepolia (for entropy operations)
@@ -35,8 +35,8 @@ export async function GET() {
         ogNetwork: {
           balance: ogBalanceInOg,
           balanceWei: ogBalance.toString(),
-          network: '0G Galileo Testnet',
-          chainId: 16602,
+          network: '0G Mainnet',
+          chainId: 16661,
           rpcUrl: ogRpcUrl
         },
         arbitrumSepolia: {

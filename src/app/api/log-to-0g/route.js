@@ -192,7 +192,7 @@ export async function POST(request) {
       error: error.message,
       transactionHash: null,
       explorerUrl: null,
-      network: '0g-galileo-testnet'
+      network: '0g-mainnet'
     }, { status: 500 });
   }
 }

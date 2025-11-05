@@ -14,6 +14,7 @@
     "deploy:move": "node move-contracts/scripts/deploy.js --network=testnet",
     "deploy:plinko": "node move-contracts/scripts/deploy.js --network=testnet --dir=move-contracts/plinko-only",
     "deploy:game-logger": "npx hardhat run scripts/deploy-game-logger.js --network 0g-galileo",
+    "deploy:game-logger:mainnet": "npx hardhat run scripts/deploy-game-logger.js --network 0g-mainnet",
     "setup:vrf-subscription": "npx hardhat run scripts/setup-vrf-subscription.js --network arbitrum-sepolia",
     "deploy:vrf": "npx hardhat run scripts/deploy-vrf-consumer.js --network arbitrum-sepolia",
     "test:vrf": "npx hardhat run scripts/test-vrf.js --network arbitrum-sepolia",
