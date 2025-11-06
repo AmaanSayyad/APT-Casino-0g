@@ -136,7 +136,7 @@ export async function POST(request) {
           if (balance < MIN_BALANCE) {
             return NextResponse.json({
               success: false,
-              error: `Insufficient balance. Current balance: ${balance.toFixed(4)} OG. Minimum required: ${MIN_BALANCE} OG. Please add funds first.`,
+              error: `Insufficient balance. Current balance: ${balance.toFixed(4)} OG. Minimum required: ${MIN_BALANCE} OG. Please contact administrator for account funding.`,
               currentBalance: balance,
               requiredBalance: MIN_BALANCE,
             }, { status: 400 });
@@ -221,17 +221,11 @@ export async function POST(request) {
       }
 
       case 'addFunds': {
-        const amount = body.amount || 0.1;
-        
-        // addLedger creates account if it doesn't exist and adds funds
-        const tx = await brokerInstance.ledger.addLedger(amount);
-
+        // Disabled on mainnet - funds should be managed by admin
         return NextResponse.json({
-          success: true,
-          transaction: tx,
-          amount,
-          message: 'Funds added successfully. Account created if it did not exist.',
-        });
+          success: false,
+          error: 'Add funds is disabled on mainnet. Please contact administrator.',
+        }, { status: 403 });
       }
       
       case 'createAccount': {

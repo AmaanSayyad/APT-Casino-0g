@@ -102,7 +102,7 @@ export function useOGComputeNetwork() {
     const MIN_INFERENCE_BALANCE = 0.5; // Minimum required for inference
     
     if (currentBalance < MIN_INFERENCE_BALANCE) {
-      const errorMsg = `Insufficient balance for inference. Current: ${currentBalance.toFixed(4)} OG, Required: ${MIN_INFERENCE_BALANCE} OG. Please add funds first.`;
+      const errorMsg = `Insufficient balance for inference. Current: ${currentBalance.toFixed(4)} OG, Required: ${MIN_INFERENCE_BALANCE} OG. Please contact administrator for account funding.`;
       setError(errorMsg);
       throw new Error(errorMsg);
     }
@@ -129,7 +129,7 @@ export function useOGComputeNetwork() {
       if (!data.success) {
         // Enhanced error message for insufficient balance
         if (data.error && data.error.includes('insufficient balance')) {
-          const errorMsg = `Insufficient balance: ${data.currentBalance ? data.currentBalance.toFixed(4) : '0'} OG. Required: ${data.requiredBalance || 0.5} OG. Please add funds first.`;
+          const errorMsg = `Insufficient balance: ${data.currentBalance ? data.currentBalance.toFixed(4) : '0'} OG. Required: ${data.requiredBalance || 0.5} OG. Please contact administrator for account funding.`;
           setError(errorMsg);
           throw new Error(errorMsg);
         }
@@ -187,42 +187,11 @@ export function useOGComputeNetwork() {
   }, [providerAddress]);
 
   /**
-   * Add funds to account
+   * Add funds to account (Disabled on mainnet)
    */
   const addFunds = useCallback(async (amount) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/og-compute', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'addFunds',
-          amount: amount,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to add funds');
-      }
-
-      // Refresh balance after adding funds
-      await refreshBalance();
-      
-      return data;
-    } catch (err) {
-      console.error('Failed to add funds:', err);
-      setError(err.message);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshBalance]);
+    throw new Error('Add funds is disabled on mainnet. Please contact administrator for account funding.');
+  }, []);
 
   /**
    * Check if balance is low
