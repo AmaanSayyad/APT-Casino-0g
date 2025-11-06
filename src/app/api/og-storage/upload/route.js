@@ -15,7 +15,7 @@ import {
   getCurrentStorageNetworkConfig,
   OG_STORAGE_SETTINGS,
   validateFileSize 
-} from '../../../config/ogStorage.js';
+} from '@/config/ogStorage.js';
 
 // Initialize indexer (singleton)
 let indexer = null;

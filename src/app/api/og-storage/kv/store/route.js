@@ -7,8 +7,8 @@
 import { NextResponse } from 'next/server';
 import { Indexer, Batcher, KvClient } from '@0glabs/0g-ts-sdk';
 import { ethers } from 'ethers';
-import { TREASURY_CONFIG } from '../../../config/treasury.js';
-import { getCurrentStorageNetworkConfig } from '../../../config/ogStorage.js';
+import { TREASURY_CONFIG } from '@/config/treasury.js';
+import OG_STORAGE_CONFIG from '@/config/ogStorage.js';
 
 // Initialize clients (singletons)
 let indexer = null;

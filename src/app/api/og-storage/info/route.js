@@ -5,7 +5,7 @@
 
 import { NextResponse } from 'next/server';
 import { Indexer } from '@0glabs/0g-ts-sdk';
-import { getCurrentStorageNetworkConfig } from '../../../config/ogStorage.js';
+import OG_STORAGE_CONFIG from '@/config/ogStorage.js';
 
 // Initialize indexer (singleton)
 let indexer = null;

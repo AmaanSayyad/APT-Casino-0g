@@ -11,8 +11,8 @@ import {
   getCurrentDANetworkConfig,
   OG_DA_BLOB_CONFIG,
   validateBlobSize 
-} from '../../../config/ogDA.js';
-import ogDAClient from '../../../services/OGDAClient.js';
+} from '@/config/ogDA.js';
+import ogDAClient from '@/services/OGDAClient.js';
 
 /**
  * POST /api/og-da/submit
