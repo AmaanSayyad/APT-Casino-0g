@@ -5,8 +5,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getCurrentDANetworkConfig } from '../../../config/ogDA.js';
-import ogDAClient from '../../../services/OGDAClient.js';
+import OG_DA_CONFIG from '@/config/ogDA.js';
+import ogDAClient from '@/services/OGDAClient.js';
 
 /**
  * GET /api/og-da/status

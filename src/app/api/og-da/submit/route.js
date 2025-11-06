@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { TREASURY_CONFIG } from '../../../config/treasury.js';
+import { TREASURY_CONFIG } from '@/config/treasury.js';
 import { 
   getCurrentDANetworkConfig,
   OG_DA_BLOB_CONFIG,
