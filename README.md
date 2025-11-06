@@ -247,3 +247,4 @@ sequenceDiagram
 - **Pitch/Slides:** https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1 
 - **Demo Video:** https://youtu.be/S3N7Us6uZdA
 - **0g Storage, 0g Compute, 0g DA Integration Video:** https://www.youtube.com/watch?v=DMvrNK7nMBo
+- **Mainnet Contracts**: https://chainscan.0g.ai/address/0xaca996a4d49e7ed42da68a20600f249be6d024a4?tab=transaction , https://chainscan.0g.ai/address/0xb424d2369f07b925d1218b08e56700af5928287b
