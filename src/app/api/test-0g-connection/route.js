@@ -6,7 +6,7 @@ export async function GET() {
   try {
     console.log('🧪 Testing 0G Network connection...');
     
-    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai';
+    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc.0g.ai';
     console.log('🔧 RPC URL:', ogRpcUrl);
     
     // Test 1: Create provider

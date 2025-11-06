@@ -450,7 +450,7 @@ export default function Navbar() {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const userAccount = accounts[0];
       
-      // Check if user is on 0G Galileo network
+      // Check if user is on 0G Mainnet network
       const chainId = await window.ethereum.request({ method: 'eth_chainId' });
       const expectedChainId = TREASURY_CONFIG.NETWORK.CHAIN_ID;
       
@@ -459,19 +459,19 @@ export default function Navbar() {
       
       if (chainId !== expectedChainId) {
         console.log('🔄 Need to switch network...');
-        // Try to switch to 0G Galileo
+        // Try to switch to 0G Mainnet
         try {
-          console.log('🔄 Attempting to switch to 0G Galileo...');
+          console.log('🔄 Attempting to switch to 0G Mainnet...');
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: expectedChainId }],
           });
-          console.log('✅ Successfully switched to 0G Galileo');
+          console.log('✅ Successfully switched to 0G Mainnet');
         } catch (switchError) {
           console.log('⚠️ Switch error:', switchError);
-          // If 0G Galileo is not added, add it
+          // If 0G Mainnet is not added, add it
           if (switchError.code === 4902) {
-            console.log('🔧 Network not found, adding 0G Galileo...');
+            console.log('🔧 Network not found, adding 0G Mainnet...');
             try {
               await window.ethereum.request({
                 method: 'wallet_addEthereumChain',
@@ -487,17 +487,17 @@ export default function Navbar() {
                   blockExplorerUrls: [TREASURY_CONFIG.NETWORK.EXPLORER_URL]
                 }]
               });
-              console.log('✅ Successfully added 0G Galileo network');
+              console.log('✅ Successfully added 0G Mainnet network');
               
               // Try to switch again after adding
               await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: expectedChainId }],
               });
-              console.log('✅ Successfully switched to 0G Galileo after adding');
+              console.log('✅ Successfully switched to 0G Mainnet after adding');
             } catch (addError) {
               console.error('❌ Failed to add network:', addError);
-              throw new Error(`Failed to add 0G Galileo network: ${addError.message}`);
+              throw new Error(`Failed to add 0G Mainnet network: ${addError.message}`);
             }
           } else {
             console.error('❌ Switch error:', switchError);

@@ -1,13 +1,13 @@
 /**
- * 0G Galileo Testnet Configuration
- * Configuration for 0G Galileo testnet with OG token
+ * 0G Mainnet Configuration
+ * Configuration for 0G Mainnet with OG token
  */
 
-// 0G Galileo Chain Configuration
+// 0G Mainnet Chain Configuration
 export const OG_GALILEO_CONFIG = {
-  chainId: 16602,
-  name: '0G-Galileo-Testnet',
-  network: 'og-galileo-testnet',
+  chainId: 16661,
+  name: '0G Mainnet',
+  network: '0g-mainnet',
   nativeCurrency: {
     decimals: 18,
     name: 'OG',
@@ -16,27 +16,26 @@ export const OG_GALILEO_CONFIG = {
   rpcUrls: {
     default: {
       http: [
-        process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai',
-        process.env.NEXT_PUBLIC_0G_GALILEO_RPC_FALLBACK || 'https://evm-rpc-galileo.0g.ai'
+        process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
+        'https://evmrpc.0g.ai'
       ],
     },
     public: {
       http: [
-        'https://evmrpc-testnet.0g.ai',
-        'https://evm-rpc-galileo.0g.ai'
+        'https://evmrpc.0g.ai'
       ],
     },
   },
   blockExplorers: {
     default: {
-      name: '0G Galileo Explorer',
-      url: process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan-galileo.0g.ai',
+      name: '0G Mainnet Explorer',
+      url: process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER || 'https://chainscan.0g.ai',
     },
   },
-  testnet: true,
+  testnet: false,
 };
 
-// 0G Galileo Tokens
+// 0G Mainnet Tokens
 export const OG_GALILEO_TOKENS = {
   OG: {
     symbol: 'OG',
@@ -45,11 +44,11 @@ export const OG_GALILEO_TOKENS = {
     address: '0x0000000000000000000000000000000000000000',
     isNative: true,
     icon: '🔮',
-    faucet: 'https://faucet.0g.ai'
+    website: 'https://0g.ai'
   }
 };
 
-// Casino configuration for 0G Galileo
+// Casino configuration for 0G Mainnet
 export const OG_GALILEO_CASINO_CONFIG = {
   // Deposit/Withdraw settings
   minDeposit: '0.001', // 0.001 OG
@@ -86,17 +85,17 @@ export const OG_GALILEO_CASINO_CONFIG = {
   }
 };
 
-// Network switching helper for 0G Galileo
+// Network switching helper for 0G Mainnet
 export const switchToOGGalileo = async () => {
   if (typeof window === 'undefined' || !window.ethereum) {
     throw new Error('MetaMask not found');
   }
 
   try {
-    // Try to switch to 0G Galileo
+    // Try to switch to 0G Mainnet
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x40da' }], // 16602 in hex
+      params: [{ chainId: '0x4115' }], // 16661 in hex
     });
   } catch (switchError) {
     // If network doesn't exist, add it
@@ -104,15 +103,15 @@ export const switchToOGGalileo = async () => {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [{
-          chainId: '0x40da',
-          chainName: '0G-Galileo-Testnet',
+          chainId: '0x4115',
+          chainName: '0G Mainnet',
           nativeCurrency: {
             name: 'OG',
             symbol: 'OG',
             decimals: 18,
           },
-          rpcUrls: ['https://evmrpc-testnet.0g.ai'],
-          blockExplorerUrls: ['https://chainscan-galileo.0g.ai'],
+          rpcUrls: ['https://evmrpc.0g.ai'],
+          blockExplorerUrls: ['https://chainscan.0g.ai'],
         }],
       });
     } else {

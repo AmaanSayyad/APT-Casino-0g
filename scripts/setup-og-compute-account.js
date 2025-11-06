@@ -9,7 +9,7 @@ const { createZGComputeNetworkBroker } = require('@0glabs/0g-serving-broker');
 require('dotenv').config();
 require('dotenv').config({ path: '.env.local', override: false });
 
-const RPC_URL = process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc-testnet.0g.ai';
+const RPC_URL = process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc.0g.ai';
 const PRIVATE_KEY = process.env.TREASURY_PRIVATE_KEY;
 const INITIAL_AMOUNT = process.argv[2] || '0.1'; // Amount in OG tokens
 

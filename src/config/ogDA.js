@@ -22,4 +22,25 @@ export const OG_DA_CONFIG = {
   ]
 };
 
+// Get current DA network configuration
+export const getCurrentDANetworkConfig = () => {
+  const network = process.env.NEXT_PUBLIC_NETWORK || process.env.NEXT_PUBLIC_DEFAULT_NETWORK;
+  const isMainnet = network === '0g-mainnet' || network === 'mainnet';
+  
+  return {
+    ...OG_DA_CONFIG,
+    rpcUrl: isMainnet 
+      ? (process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai')
+      : (process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai'),
+    chainId: isMainnet ? 16661 : 16602,
+    networkName: isMainnet ? '0G Mainnet' : '0G Testnet'
+  };
+};
+
+// Validate blob size
+export const validateBlobSize = (data) => {
+  const size = typeof data === 'string' ? new Blob([data]).size : data.length;
+  return size <= OG_DA_CONFIG.maxDataSize;
+};
+
 export default OG_DA_CONFIG;

@@ -5,18 +5,18 @@
 
 // 0G Network RPC URLs
 export const OG_COMPUTE_NETWORK_CONFIG = {
-  // Testnet configuration
-  testnet: {
-    rpcUrl: process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc-testnet.0g.ai',
-    networkName: '0G Testnet',
-    chainId: 16602,
-  },
-  
   // Mainnet configuration
   mainnet: {
-    rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC_URL || 'https://evmrpc.0g.ai',
+    rpcUrl: process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc.0g.ai',
     networkName: '0G Mainnet',
-    chainId: 16601,
+    chainId: 16661,
+  },
+  
+  // Testnet configuration (legacy)
+  testnet: {
+    rpcUrl: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai',
+    networkName: '0G Testnet',
+    chainId: 16602,
   },
 };
 
@@ -75,7 +75,12 @@ export const OG_COMPUTE_SERVICE_CONFIG = {
 
 // Get current network config (testnet or mainnet)
 export const getCurrentNetworkConfig = () => {
-  const isMainnet = process.env.NEXT_PUBLIC_NETWORK === 'MAINNET';
+  // Check if we're using mainnet
+  const network = process.env.NEXT_PUBLIC_NETWORK || process.env.NEXT_PUBLIC_DEFAULT_NETWORK;
+  const isMainnet = network === '0g-mainnet' || network === 'mainnet';
+  
+  console.log('🔧 getCurrentNetworkConfig:', { network, isMainnet });
+  
   return isMainnet 
     ? OG_COMPUTE_NETWORK_CONFIG.mainnet 
     : OG_COMPUTE_NETWORK_CONFIG.testnet;

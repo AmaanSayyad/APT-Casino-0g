@@ -25,8 +25,8 @@ export async function POST(request) {
     }
 
     // 0G Network configuration
-    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai';
-    const ogExplorerUrl = process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan-galileo.0g.ai';
+    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc.0g.ai';
+    const ogExplorerUrl = process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan.0g.ai';
     
     // Create provider and wallet for 0G Network
     console.log('🔧 0G LOGGER API: Connecting to 0G Network...');
@@ -203,7 +203,7 @@ export async function GET() {
     if (!TREASURY_CONFIG?.PRIVATE_KEY || TREASURY_CONFIG.PRIVATE_KEY.length < 10) {
       return NextResponse.json({ success: false, error: 'Treasury private key missing on server', status: 'error' }, { status: 503 });
     }
-    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai';
+    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc.0g.ai';
     const provider = new ethers.JsonRpcProvider(ogRpcUrl);
     const treasuryWallet = new ethers.Wallet(TREASURY_CONFIG.PRIVATE_KEY, provider);
     

@@ -22,9 +22,9 @@ module.exports = {
       type: 0 // Legacy transaction
     },
     "0g-galileo": {
-      url: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || "https://evmrpc-testnet.0g.ai",
+      url: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || "https://evmrpc.0g.ai",
       accounts: process.env.TREASURY_PRIVATE_KEY ? [process.env.TREASURY_PRIVATE_KEY] : [],
-      chainId: 16602,
+      chainId: 16661,
       gasPrice: 3000000000, // 3 gwei
       gas: 8000000,
       type: 0 // Legacy transaction
@@ -37,10 +37,10 @@ module.exports = {
     customChains: [
       {
         network: "0g-galileo",
-        chainId: 16602,
+        chainId: 16661,
         urls: {
-          apiURL: "https://chainscan-galileo.0g.ai/api",
-          browserURL: "https://chainscan-galileo.0g.ai"
+          apiURL: "https://chainscan.0g.ai/api",
+          browserURL: "https://chainscan.0g.ai"
         }
       }
     ]

@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 const TREASURY_PRIVATE_KEY = process.env.TREASURY_PRIVATE_KEY || "0x080c0b0dc7aa27545fab73d29b06f33e686d1491aef785bf5ced325a32c14506";
 
 // 0G Galileo RPC URL
-const OG_GALILEO_RPC = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai';
+const OG_GALILEO_RPC = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc.0g.ai';
 
 // Create provider and wallet
 const provider = new ethers.JsonRpcProvider(OG_GALILEO_RPC);

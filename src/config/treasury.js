@@ -9,12 +9,12 @@ export const TREASURY_CONFIG = {
   // ⚠️  DEVELOPMENT ONLY - Never use in production!
   PRIVATE_KEY: process.env.TREASURY_PRIVATE_KEY || '0x080c0b0dc7aa27545fab73d29b06f33e686d1491aef785bf5ced325a32c14506',
   
-  // Network configuration for 0G Galileo Testnet (for deposit/withdraw)
+  // Network configuration for 0G Mainnet (for deposit/withdraw)
   NETWORK: {
-    CHAIN_ID: '0x40da', // 0G Galileo testnet (16602 in hex)
-    CHAIN_NAME: '0G-Galileo-Testnet',
-    RPC_URL: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai',
-    EXPLORER_URL: process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan-galileo.0g.ai'
+    CHAIN_ID: '0x4115', // 0G Mainnet (16661 in hex)
+    CHAIN_NAME: '0G Mainnet',
+    RPC_URL: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
+    EXPLORER_URL: process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER || 'https://chainscan.0g.ai'
   },
   
   // Gas settings for transactions
