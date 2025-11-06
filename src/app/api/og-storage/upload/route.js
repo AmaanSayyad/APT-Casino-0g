@@ -10,7 +10,7 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import { ZgFile, Indexer } from '@0glabs/0g-ts-sdk';
 import { ethers } from 'ethers';
-import { TREASURY_CONFIG } from '../../../config/treasury.js';
+import { TREASURY_CONFIG } from '@/config/treasury.js';
 import { 
   getCurrentStorageNetworkConfig,
   OG_STORAGE_SETTINGS,
