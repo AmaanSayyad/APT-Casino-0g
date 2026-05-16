@@ -7,7 +7,7 @@
 export const OG_COMPUTE_NETWORK_CONFIG = {
   // Mainnet configuration
   mainnet: {
-    rpcUrl: process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc.0g.ai',
+    rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc.0g.ai',
     networkName: '0G Mainnet',
     chainId: 16661,
   },

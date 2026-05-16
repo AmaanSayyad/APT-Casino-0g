@@ -62,7 +62,14 @@ export default function Bank() {
       // Fetch ledger balance (needs broker + account to exist)
       const lRes = await fetch("/api/og-compute?action=balance");
       const lj = await lRes.json();
-      setAiBalance(lj.success ? parseFloat(lj.balance).toFixed(4) : null);
+      if (lj.success) {
+        setAiBalance(parseFloat(lj.balance).toFixed(4));
+        if (!lj.ledgerExists && lj.message) {
+          setAiTopUpMsg({ ok: false, text: lj.message });
+        }
+      } else {
+        setAiBalance(null);
+      }
     } catch {
       setAiBalance(null);
     } finally {

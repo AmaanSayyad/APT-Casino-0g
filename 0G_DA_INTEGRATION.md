@@ -4,7 +4,7 @@ This documentation explains how 0G DA is integrated into the casino application.
 
 **For detailed setup guide, see:** [0G_DA_SETUP_GUIDE.md](./0G_DA_SETUP_GUIDE.md)  
 **Env template:** [`.env.example`](./.env.example)  
-**0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
 
 ## Overview
 
@@ -254,6 +254,7 @@ const result = await ogDAClient.disperseBlob(blobData);
 
 ## Resources
 
+- [Demo Video](https://youtu.be/V5e2zKgOQPo)
 - [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G DA Integration Guide](0g-doc-main/docs/developer-hub/building-on-0g/da-integration.md)
 - [0G DA Technical Deep Dive](0g-doc-main/docs/developer-hub/building-on-0g/da-deep-dive.md)

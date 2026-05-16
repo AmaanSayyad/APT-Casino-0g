@@ -8,7 +8,7 @@ I was very annoyed of that's how APT-Casino was born, which is a combination of 
 
 | Resource | Link |
 |----------|------|
-| Demo Video | [youtu.be/S3N7Us6uZdA](https://youtu.be/S3N7Us6uZdA) |
+| Demo Video | [youtu.be/V5e2zKgOQPo](https://youtu.be/V5e2zKgOQPo) |
 | 0G Storage, Compute & DA Integration Video | [youtu.be/DMvrNK7nMBo](https://youtu.be/DMvrNK7nMBo) |
 | Pitch / Slides | [Figma deck](https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1) |
 | Live (Vercel) | — |
@@ -64,7 +64,37 @@ The traditional online gambling industry is plagued by several issues, including
 
 ### 0g Storage, 0g DA Architecture
 
+```mermaid
+flowchart LR
+    subgraph App["Casino App"]
+        G[Game ends] --> API[log-to-0g / og-da API]
+    end
+    subgraph DA["0G Data Availability"]
+        API --> BLOB[Blob submit]
+        BLOB --> AUDIT[Immutable audit trail]
+    end
+    subgraph Store["0G Storage"]
+        API2[og-storage API] --> FILES[Game assets / profiles]
+    end
+    G --> API2
+```
+
 ### 0g Compute Architecture
+
+```mermaid
+flowchart TB
+    subgraph Bank["Bank Page"]
+        TOP[Top Up AI] --> API[og-compute API]
+    end
+    subgraph Compute["0G Compute Network"]
+        API --> LEDGER[AI Ledger]
+        LEDGER --> INF[Inference providers]
+    end
+    subgraph Games["AI Assistant"]
+        CHAT[Chat UI] --> API
+        INF --> CHAT
+    end
+```
 
 - **Frontend**: Next.js (App Router), React 18, Tailwind, MUI, Three.js
 - **Wallet/Chain**: wagmi + RainbowKit
@@ -159,18 +189,19 @@ graph TB
         I --> OGDAAPI[0G DA API]
     end
     subgraph OG["0G Ecosystem"]
-        OGChain[0G Chain<br/>Galileo Testnet]
-        OGCompute[0G Compute<br/>AI Inference]
-        OGStorage[0G Storage<br/>File Storage]
-        OGDA[0G DA<br/>Data Availability]
+        OGMain[0G Mainnet · 16661]
+        OGGal[Galileo Testnet · 16602]
+        OGCompute[0G Compute · AI]
+        OGStorage[0G Storage]
+        OGDA[0G DA]
     end
-    subgraph 0GNet["Gaming Network — 0G Testnet"]
-        OGChain --> DEP[Deposits/Withdrawals]
-        OGChain --> Contracts[Smart Contracts]
+    subgraph Gaming["Gaming on 0G"]
+        OGMain --> DEP[Deposits / Withdrawals]
+        OGGal --> DEP
+        OGMain --> GL[GameLogger contract]
     end
-    subgraph Entropy["Entropy Network — Arbitrum Sepolia"]
-        AS[Arbitrum Sepolia] --> N[Entropy Consumer]
-        N --> O[Pyth Entropy]
+    subgraph RNG["Verifiable randomness"]
+        PE[Pyth Entropy oracle]
     end
     subgraph Data["Data Layer"]
         Q[PostgreSQL] --> R[User Data]
@@ -179,34 +210,121 @@ graph TB
     A --> F
     B --> I
     AI --> OGComputeAPI
-    I --> OG
-    I --> AS
+    I --> OGMain
+    I --> OGGal
+    I --> PE
     I --> Q
     I --> S
     OGComputeAPI --> OGCompute
     OGStorageAPI --> OGStorage
     OGDAAPI --> OGDA
-    OGCompute --> OGChain
-    OGStorage --> OGChain
-    OGDA --> OGChain
+    OGCompute --> OGMain
+    OGStorage --> OGMain
+    OGDA --> OGMain
+```
+
+## 💰 Deposit & Withdraw Flow (0G)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Player (MetaMask)
+    participant UI as Bank / Navbar
+    participant W as wagmi wallet client
+    participant T as Treasury (0G)
+    participant API as /api/withdraw
+
+    U->>UI: Connect wallet (0G Mainnet or Galileo)
+    U->>UI: Deposit OG amount
+    UI->>W: sendTransaction → treasury address
+    W->>T: Native OG transfer on connected chain
+    T-->>UI: Tx hash · balance credited in-app
+
+    U->>UI: Withdraw house balance
+    UI->>API: POST { userAddress, amount, chainId }
+    API->>T: Sign & send OG from treasury
+    T-->>U: OG received on same chainId
+    UI-->>U: Success + explorer link
+```
+
+## 🤖 0G Compute — AI Ledger Top-Up
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Admin (Bank page)
+    participant API as /api/og-compute
+    participant B as 0G Compute Broker
+    participant L as AI Ledger (on-chain)
+    participant AI as AI Assistant
+
+    U->>API: GET walletBalance
+    API-->>U: Treasury OG on 0G
+
+    U->>API: POST createAccount / addFunds
+    API->>B: depositFund or addLedger
+    B->>L: Fund ledger with OG
+    L-->>U: Ledger balance updated
+
+    U->>AI: Chat / inference request
+    AI->>API: POST inference
+    API->>B: getLedger + call provider
+    B-->>AI: Model response
+```
+
+## 📦 0G Storage & DA — Game Audit Trail
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant G as Game (Roulette / Mines / …)
+    participant H as useGameHistory
+    participant LOG as /api/log-to-0g
+    participant DA as /api/og-da/submit
+    participant GL as GameLogger (0G)
+    participant DB as Postgres (optional)
+
+    G->>H: saveGameResult + chainId
+    H->>LOG: Game payload
+    LOG->>GL: logGame (optional mainnet contract)
+    H->>DA: Batch to 0G DA blob
+    DA-->>H: blobHash
+    H->>DB: Persist history (DATABASE_URL)
+    H-->>G: Explorer / proof metadata
 ```
 
 ## 🎲 Pyth Entropy Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as Game UI
+    participant API as /api/generate-entropy
+    participant TW as Treasury wallet
+    participant PE as Pyth Entropy
+    participant G as Game engine
+
+    UI->>API: Request random outcome
+    API->>TW: requestV2 (pay oracle fee)
+    TW->>PE: Entropy request tx
+    PE-->>API: RandomnessFulfilled + requestId
+    API-->>UI: randomValue + txExplorerUrl
+    UI->>G: Apply outcome (win/loss, payout)
+    G-->>UI: Updated game state
+```
 
 ```mermaid
 graph LR
     subgraph Frontend["Frontend"]
         A[Game Component] --> B[Entropy Request]
     end
-    subgraph Contracts["Smart Contracts"]
-        C[Entropy Consumer] --> D[request]
-        D --> E[Pyth Entropy]
+    subgraph Oracle["Entropy oracle"]
+        E[Pyth Entropy] --> H[Fulfilled proof]
     end
-    subgraph Callback["Callback"]
-        H[entropyCallback] --> J[Update State]
+    subgraph Callback["Result"]
+        H --> J[Update game state]
     end
-    B --> C
-    E --> H
+    B --> E
 ```
 
 ## 🎮 Game Execution Flow
@@ -217,26 +335,65 @@ sequenceDiagram
     participant U as User
     participant UI as Game UI (Next.js)
     participant API as Next.js API Route
-    participant OG as 0G Network (Game Tx)
-    participant AE as Arbitrum Sepolia (Entropy)
-    participant PE as Pyth Entropy
+    participant OG as 0G (Mainnet / Galileo)
+    participant RNG as Pyth Entropy API
     participant DB as Postgres
-    participant RD as Redis
+    participant DA as 0G DA
 
     U->>UI: Place bet / select game
-    UI->>OG: Submit bet tx (treasury-sponsored)
-    OG-->>UI: Tx confirmed (receipt)
+    Note over UI,OG: In-app balance (treasury-backed)
+    UI->>API: POST /api/generate-entropy
+    API->>RNG: requestV2 → random outcome
+    RNG-->>API: randomValue + proof
+    API-->>UI: Win / loss + payout
+    API->>DB: Save game_results
+    API->>DA: Optional audit blob
+    UI->>U: Update balance + history
+```
 
-    UI->>API: POST /api/entropy/request
-    API->>AE: call Consumer.request(userSeed)
-    AE->>PE: request entropy
-    PE-->>AE: entropyCallback(proof)
-    AE-->>API: event (EntropyFulfilled)
-    API->>DB: persist result, audit trail
-    API->>RD: cache balances, leaderboard
-    API-->>UI: result payload (win/lose, payout)
+## 🌐 End-to-End Player Journey
 
-    UI->>U: Update UI + balances
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Player
+    participant APP as APT-Casino
+    participant OG as 0G Chain
+    participant CHAT as Live Chat (Supabase)
+    participant STREAM as Live (Livepeer / YouTube)
+
+    U->>APP: Connect MetaMask · 0G network
+    U->>OG: Deposit OG → treasury
+    OG-->>APP: In-app balance
+    U->>APP: Play Roulette / Mines / Plinko / Wheel
+    APP-->>U: Provably fair result
+    U->>CHAT: Wallet-signed messages
+    U->>STREAM: Watch or share stream
+    U->>APP: Withdraw on same chainId
+    APP->>OG: Treasury sends OG to player
+    OG-->>U: Funds in wallet
+```
+
+## 🏛 Treasury & On-Chain Logging
+
+```mermaid
+flowchart TB
+    subgraph Wallets["Wallets"]
+        P[Player EOA]
+        T[Treasury EOA]
+    end
+    subgraph OnChain["0G Mainnet contracts"]
+        GL[GameLogger<br/>0xaca996…]
+    end
+    subgraph OffChain["App layer"]
+        REDUX[In-app balance]
+        API[Withdraw API]
+    end
+    P -->|Deposit OG| T
+    T -->|Withdraw OG| P
+    API --> T
+    REDUX -.->|credits on deposit| P
+    GL -->|logGame audit| T
 ```
 
 ## Business Model

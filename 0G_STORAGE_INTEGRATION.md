@@ -3,7 +3,7 @@
 Complete integration guide for 0G Storage in the casino application.
 
 **Env template:** [`.env.example`](./.env.example) · **App networks:** 0G Mainnet (`16661`) and Galileo Testnet (`16602`)  
-**0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
 
 ## Overview
 
@@ -373,6 +373,7 @@ Retrieve key-value data.
 
 ## Resources
 
+- [Demo Video](https://youtu.be/V5e2zKgOQPo)
 - [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G Storage SDK Documentation](0g-doc-main/docs/developer-hub/building-on-0g/storage/sdk.md)
 - [0G Storage Concepts](0g-doc-main/docs/concepts/storage.md)

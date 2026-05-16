@@ -93,21 +93,18 @@ export default function HeroSection() {
       <div className="relative mt-12 w-full max-w-4xl mx-auto px-2">
         <div className="absolute -inset-1 bg-gradient-to-r from-red-magic/50 to-blue-magic/50 rounded-2xl blur-md" />
         <div
-          className="relative z-10 aspect-[863/487] w-full max-h-[min(52vh,520px)] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
-          style={{
-            background:
-              "linear-gradient(165deg, rgba(146,0,225,0.25) 0%, rgba(7,0,5,0.9) 45%, rgba(36,20,227,0.2) 100%), radial-gradient(ellipse 70% 50% at 50% 100%, rgba(241,50,77,0.35), transparent 60%)",
-          }}
+          className="relative z-10 aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black"
         >
-          <div className="absolute inset-0 opacity-30 bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,rgba(255,255,255,0.04)_2px,rgba(255,255,255,0.04)_4px)] pointer-events-none" />
-          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#070005] to-transparent pointer-events-none" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-white/40 text-sm font-medium tracking-[0.2em] uppercase px-6 text-center">
-              On-chain randomness · 0G · Pyth Entropy
-            </p>
-          </div>
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src="https://www.youtube.com/embed/V5e2zKgOQPo?si=T1e99TQZgKFMPYkc"
+            title="APT Casino demo — on-chain randomness on 0G"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
           {isDev && (
-            <div className="absolute top-4 right-4 bg-yellow-600/80 text-white text-xs px-2 py-1 rounded-md z-20">
+            <div className="absolute top-4 right-4 bg-yellow-600/80 text-white text-xs px-2 py-1 rounded-md z-20 pointer-events-none">
               Dev Mode
             </div>
           )}

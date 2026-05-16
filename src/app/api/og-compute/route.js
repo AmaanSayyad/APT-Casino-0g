@@ -19,6 +19,40 @@ let broker = null;
 let isBrokerInitialized = false;
 let lastNetworkRpc = null;
 
+function isMissingLedgerError(error) {
+  const msg = error?.message || '';
+  return (
+    error?.code === 'BAD_DATA' ||
+    error?.value === '0x' ||
+    msg.includes('could not decode result data') ||
+    msg.includes('not exist') ||
+    msg.includes('not found')
+  );
+}
+
+/** Returns ledger balance, or zero if no compute account exists on this network yet. */
+async function getLedgerBalanceSafe(brokerInstance) {
+  try {
+    const account = await brokerInstance.ledger.getLedger();
+    return {
+      balance: ethers.formatEther(account.totalBalance),
+      raw: { totalBalance: account.totalBalance.toString() },
+      ledgerExists: true,
+    };
+  } catch (error) {
+    if (isMissingLedgerError(error)) {
+      return {
+        balance: '0',
+        raw: { totalBalance: '0' },
+        ledgerExists: false,
+        message:
+          'No AI compute ledger on this network yet. Fund the treasury wallet with OG, then use Top Up AI.',
+      };
+    }
+    throw error;
+  }
+}
+
 async function getBroker() {
   const networkConfig = getCurrentNetworkConfig();
 
@@ -76,13 +110,13 @@ export async function GET(request) {
 
     switch (action) {
       case 'balance': {
-        const account = await brokerInstance.ledger.getLedger();
+        const ledger = await getLedgerBalanceSafe(brokerInstance);
         return NextResponse.json({
           success: true,
-          balance: ethers.formatEther(account.totalBalance),
-          raw: {
-            totalBalance: account.totalBalance.toString(),
-          },
+          balance: ledger.balance,
+          ledgerExists: ledger.ledgerExists,
+          message: ledger.message,
+          raw: ledger.raw,
         });
       }
 
@@ -145,24 +179,22 @@ export async function POST(request) {
         }
 
         // Check balance before proceeding
-        try {
-          const account = await brokerInstance.ledger.getLedger();
-          const balance = parseFloat(ethers.formatEther(account.totalBalance));
-          
-          // Minimum required balance for inference (0.5 OG to be safe)
+        {
+          const ledger = await getLedgerBalanceSafe(brokerInstance);
+          const balance = parseFloat(ledger.balance);
           const MIN_BALANCE = 0.5;
-          
-          if (balance < MIN_BALANCE) {
+
+          if (!ledger.ledgerExists || balance < MIN_BALANCE) {
             return NextResponse.json({
               success: false,
-              error: `Insufficient balance. Current balance: ${balance.toFixed(4)} OG. Minimum required: ${MIN_BALANCE} OG. Please contact administrator for account funding.`,
+              error: ledger.ledgerExists
+                ? `Insufficient balance. Current balance: ${balance.toFixed(4)} OG. Minimum required: ${MIN_BALANCE} OG. Top up the AI ledger on the Bank page.`
+                : `No AI compute ledger on this network. Top up at least ${MIN_BALANCE} OG on the Bank → AI Compute tab.`,
               currentBalance: balance,
               requiredBalance: MIN_BALANCE,
+              ledgerExists: ledger.ledgerExists,
             }, { status: 400 });
           }
-        } catch (balanceError) {
-          console.warn('⚠️ Could not check balance:', balanceError);
-          // Continue anyway, let the provider handle it
         }
 
         // Get service metadata

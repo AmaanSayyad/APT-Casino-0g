@@ -3,7 +3,7 @@
 Complete architecture diagram showing how all 0G services are integrated into the casino application.
 
 **Networks:** 0G Mainnet (`16661`) + Galileo Testnet (`16602`) for gaming/treasury; Arbitrum Sepolia (`421614`) for Pyth Entropy. **Env:** [`.env.example`](./.env.example)  
-**0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
 
 ## System Architecture Diagram
 
