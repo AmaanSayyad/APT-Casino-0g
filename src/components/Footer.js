@@ -6,6 +6,7 @@ import Image from "next/image";
 import BrandWordmark from "./BrandWordmark";
 import GradientBorderButton from "./GradientBorderButton";
 import { FaGlobe, FaChevronDown, FaChevronUp, FaMobileAlt, FaLock, FaShieldAlt, FaCoins } from "react-icons/fa";
+import { LIVE_APP_URL } from "@/config/site";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -148,6 +149,17 @@ export default function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <a
+                href={LIVE_APP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/70 hover:text-white flex items-center transition-all group"
+              >
+                <span className="w-0 h-[1px] magic-gradient mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>
+                Live App (Vercel)
+              </a>
+            </li>
           </ul>
           
          
