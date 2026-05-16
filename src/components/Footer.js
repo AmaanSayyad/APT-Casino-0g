@@ -133,10 +133,14 @@ export default function Footer() {
             <h3 className="font-display text-lg">Navigation</h3>
           </div>
           <ul className="space-y-3 mt-4">
-            {["Home", "Game", "Bank", "About Us", "FAQs"].map((item) => (
+            {["Home", "Game", "Bank", "Live", "About Us", "FAQs"].map((item) => (
               <li key={item}>
                 <Link 
-                  href={item.toLowerCase() === "home" ? "/" : `/${item.toLowerCase().replace(" ", "-")}`} 
+                  href={
+                    item.toLowerCase() === "home"
+                      ? "/"
+                      : `/${item.toLowerCase().replace(" ", "-")}`
+                  }
                   className="text-white/70 hover:text-white flex items-center transition-all group"
                 >
                   <span className="w-0 h-[1px] magic-gradient mr-0 group-hover:w-2 group-hover:mr-2 transition-all"></span>

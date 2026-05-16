@@ -1,6 +1,6 @@
 # Pyth Entropy Randomness Logic Documentation
 
-> Randomness runs on **Arbitrum Sepolia** (not on 0G). Gaming deposits/withdrawals use **0G Mainnet** or **Galileo Testnet**. See [`.env.example`](./.env.example).
+> Randomness runs on **Arbitrum Sepolia** (not on 0G). Gaming deposits/withdrawals use **0G Mainnet** or **Galileo Testnet**. See [`.env.example`](./.env.example). **Live app:** https://apt-casino-0g-gamma.vercel.app/
 
 ## Overview
 This document explains the complete Pyth Entropy randomness implementation in the APT Casino project. The system uses Pyth Network's entropy service to generate verifiable random numbers for casino games.

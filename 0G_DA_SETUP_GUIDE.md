@@ -2,7 +2,7 @@
 
 Complete guide for integrating and using 0G DA in the casino application.
 
-**Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Live app:** https://apt-casino-0g-gamma.vercel.app/ · **Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
 
 ## Table of Contents
 
@@ -571,6 +571,7 @@ This will:
 
 ## Additional Resources
 
+- [Live App (Vercel)](https://apt-casino-0g-gamma.vercel.app/)
 - [Demo Video](https://youtu.be/V5e2zKgOQPo)
 - [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G DA Technical Deep Dive](0g-doc-main/docs/developer-hub/building-on-0g/da-deep-dive.md)

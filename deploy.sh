@@ -272,7 +272,7 @@ main() {
     echo ""
     echo "Next steps:"
     echo "1. Set environment variables in Vercel dashboard"
-    echo "2. Test the deployed application"
+    echo "2. Test the deployed application: https://apt-casino-0g-gamma.vercel.app/"
     echo "3. Monitor contract events and transactions"
     echo ""
     echo "For support, check the README.md file"

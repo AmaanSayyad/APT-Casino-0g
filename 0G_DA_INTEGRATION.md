@@ -4,7 +4,7 @@ This documentation explains how 0G DA is integrated into the casino application.
 
 **For detailed setup guide, see:** [0G_DA_SETUP_GUIDE.md](./0G_DA_SETUP_GUIDE.md)  
 **Env template:** [`.env.example`](./.env.example)  
-**Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Live app:** https://apt-casino-0g-gamma.vercel.app/ · **Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
 
 ## Overview
 
@@ -254,6 +254,7 @@ const result = await ogDAClient.disperseBlob(blobData);
 
 ## Resources
 
+- [Live App (Vercel)](https://apt-casino-0g-gamma.vercel.app/)
 - [Demo Video](https://youtu.be/V5e2zKgOQPo)
 - [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G DA Integration Guide](0g-doc-main/docs/developer-hub/building-on-0g/da-integration.md)

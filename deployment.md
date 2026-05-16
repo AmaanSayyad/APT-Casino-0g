@@ -6,6 +6,7 @@
 
 | Item | Command / location |
 |------|------------------|
+| Live app (Vercel) | https://apt-casino-0g-gamma.vercel.app/ |
 | GameLogger on 0G | `npm run deploy:game-logger:mainnet` or `deploy:game-logger` (Galileo) |
 | Pyth entropy consumer | `npm run deploy:pyth-entropy` (Arbitrum Sepolia) |
 | Treasury | Set `TREASURY_ADDRESS` + `TREASURY_PRIVATE_KEY` in `.env` |

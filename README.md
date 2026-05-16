@@ -11,7 +11,7 @@ I was very annoyed of that's how APT-Casino was born, which is a combination of 
 | Demo Video | [youtu.be/V5e2zKgOQPo](https://youtu.be/V5e2zKgOQPo) |
 | 0G Storage, Compute & DA Integration Video | [youtu.be/DMvrNK7nMBo](https://youtu.be/DMvrNK7nMBo) |
 | Pitch / Slides | [Figma deck](https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1) |
-| Live (Vercel) | — |
+| Live (Vercel) | [apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app/) |
 | GameLogger contract (0G Mainnet) | [chainscan.0g.ai](https://chainscan.0g.ai/address/0xaca996a4d49e7ed42da68a20600f249be6d024a4?tab=transaction) |
 | Treasury wallet (0G Mainnet) | [chainscan.0g.ai](https://chainscan.0g.ai/address/0xe7cd1b07900eb06d59e5b3b3c65033c484e41009?tab=transaction) |
 
@@ -119,6 +119,8 @@ flowchart TB
 - **Wheel**: Multiple segments with adjustable volatility
 
 ## 🚀 Getting Started (Dev)
+
+**Production:** https://apt-casino-0g-gamma.vercel.app/
 
 Prereqs: Node >= 18
 

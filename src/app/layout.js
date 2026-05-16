@@ -4,6 +4,7 @@ import Providers from "./providers";
 import Navbar from "@/components/Navbar.js";
 import Footer from "@/components/Footer";
 import GlobalWalletManager from "@/components/GlobalWalletManager";
+import { LIVE_APP_URL } from "@/config/site";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -14,8 +15,14 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
+  metadataBase: new URL(LIVE_APP_URL),
   title: "APT Casino",
-  description: "APT Casino",
+  description: "Provably fair casino on 0G Network — deposits, games, live streaming, and AI assistant.",
+  openGraph: {
+    url: LIVE_APP_URL,
+    siteName: "APT Casino",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {
