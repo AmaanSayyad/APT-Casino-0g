@@ -2,6 +2,8 @@
 
 Complete guide for integrating and using 0G DA in the casino application.
 
+**0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -569,6 +571,7 @@ This will:
 
 ## Additional Resources
 
+- [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G DA Technical Deep Dive](0g-doc-main/docs/developer-hub/building-on-0g/da-deep-dive.md)
 - [DA Integration Guide](0g-doc-main/docs/developer-hub/building-on-0g/da-integration.md)
 - [0G DA Example Repository](https://github.com/0gfoundation/0g-da-example-rust)

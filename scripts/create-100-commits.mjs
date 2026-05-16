@@ -136,9 +136,10 @@ while (i < TOTAL && commitNum < TARGET) {
   i += batch.length;
 
   const msg = commitMsg(batch);
-  const daysAgo = TARGET - commitNum;
+  // Stagger commits a few minutes apart on the same day (today)
   const d = new Date();
-  d.setDate(d.getDate() - daysAgo);
+  d.setHours(9, 0, 0, 0);
+  d.setMinutes(d.getMinutes() + commitNum * 4);
   const iso = d.toISOString();
 
   for (const f of batch) {
