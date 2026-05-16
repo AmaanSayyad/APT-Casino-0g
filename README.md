@@ -1,5 +1,11 @@
 ## APT-Casino 
 
+A couple of days back, I was was on etherscan exploring some transactions and saw an advertisement of https://stake.com/ which was giving 200% bonus on first deposit, I deposited 120 USDT into stake.com they gave 360 USDT as total balance in their controlled custodial wallet and when I started playing casino games I was shocked to see that I was only able to play with $1 per game and was unable to increase the betting amount beyond $1 coz and when I tried to explore and play other games on the platform the issue was persisting, I reached the customer support and got to know that this platform has cheated him under the name of wager limits as I was using the bonus scheme of 200%.
+
+When I asked the customer support to withdraw money they showed a rule list of wager limit, which said that if I wanted to withdraw the deposited amount, then I have to play $12,300 worth of gameplay and this was a big shock for me, as I was explained a maths logic by their live support. Thereby, In the hope of getting the deposited money back, I played the different games of stake.com like roulette, mines, spin wheel, etc, the entire night and lost all the money.
+
+I was very annoyed of that's how APT-Casino was born, which is a combination of GameFi and DeFi all in one platform where new web3 users can play games, perform gambling, but have a safe, secure, transparent platform that does not scam any of their users. Also, I wanted to address common issues in traditional gambling platforms.
+
 | Resource | Link |
 |----------|------|
 | Demo Video | [youtu.be/S3N7Us6uZdA](https://youtu.be/S3N7Us6uZdA) |
@@ -8,12 +14,6 @@
 | Live (Vercel) | — |
 | GameLogger contract (0G Mainnet) | [chainscan.0g.ai](https://chainscan.0g.ai/address/0xaca996a4d49e7ed42da68a20600f249be6d024a4?tab=transaction) |
 | Treasury wallet (0G Mainnet) | [chainscan.0g.ai](https://chainscan.0g.ai/address/0xe7cd1b07900eb06d59e5b3b3c65033c484e41009?tab=transaction) |
-
-A couple of days back, I was was on etherscan exploring some transactions and saw an advertisement of https://stake.com/ which was giving 200% bonus on first deposit, I deposited 120 USDT into stake.com they gave 360 USDT as total balance in their controlled custodial wallet and when I started playing casino games I was shocked to see that I was only able to play with $1 per game and was unable to increase the betting amount beyond $1 coz and when I tried to explore and play other games on the platform the issue was persisting, I reached the customer support and got to know that this platform has cheated him under the name of wager limits as I was using the bonus scheme of 200%.
-
-When I asked the customer support to withdraw money they showed a rule list of wager limit, which said that if I wanted to withdraw the deposited amount, then I have to play $12,300 worth of gameplay and this was a big shock for me, as I was explained a maths logic by their live support. Thereby, In the hope of getting the deposited money back, I played the different games of stake.com like roulette, mines, spin wheel, etc, the entire night and lost all the money.
-
-I was very annoyed of that's how APT-Casino was born, which is a combination of GameFi and DeFi all in one platform where new web3 users can play games, perform gambling, but have a safe, secure, transparent platform that does not scam any of their users. Also, I wanted to address common issues in traditional gambling platforms.
 
 ## 🧩 Problems
 
@@ -33,6 +33,7 @@ The traditional online gambling industry is plagued by several issues, including
 
 - **Provably Fair Gaming:** Utilising the **Pyth Entropy** on-chain randomness module, my platform ensures all game outcomes are 100% transparent and verifiably fair.  
 
+<img width="2726" height="1514" alt="commit_and_reveal 9cf0e248" src="https://github.com/user-attachments/assets/36219c24-43c8-4919-a0bc-e089a4b82f7b" />
 
 - **Flexible Withdrawal Policies:** Providing users with unrestricted access to their funds.  
 - **Transparent Bonus Schemes:** Clear and clean bonus terms without hidden traps.  
@@ -46,6 +47,8 @@ The traditional online gambling industry is plagued by several issues, including
 
 - **On-Chain Randomness:** Utilizing **Pyth Entropy** on-chain randomness module to ensure provably fair game outcomes.
 
+<img width="1536" height="864" alt="19ac95f94ea352ba9212063406586070" src="https://github.com/user-attachments/assets/685202d2-bfde-4d6d-bc40-5983b0152233" />
+
 
 - **Decentralized Asset Management:** Users retain full control over their funds through secure and transparent blockchain transactions.  
 - **User-Friendly Interface:** An intuitive and secure interface for managing funds, placing bets, and interacting with games.  
@@ -57,6 +60,7 @@ The traditional online gambling industry is plagued by several issues, including
 - **Dual 0G networks:** Deposits and withdrawals use the 0G chain your wallet is connected to (Mainnet or Galileo Testnet); withdrawals are sent on the same `chainId`.
 
 ## 🧩 Architecture
+<img width="1458" height="683" alt="Screenshot 2026-05-16 at 2 11 53 PM" src="https://github.com/user-attachments/assets/777e740e-68e7-47dc-b864-a8c04121c12a" />
 
 ### 0g Storage, 0g DA Architecture
 
@@ -234,10 +238,14 @@ sequenceDiagram
 
     UI->>U: Update UI + balances
 ```
+
 ## Business Model
+
+<img width="1710" height="981" alt="Screenshot 2026-05-16 at 2 02 40 PM" src="https://github.com/user-attachments/assets/ecfbcce3-fde9-4b17-b169-0c777e28778b" />
 
 ## 🗺 Roadmap
 
+<img width="1710" height="981" alt="Screenshot 2026-05-16 at 2 02 59 PM" src="https://github.com/user-attachments/assets/d3c632e0-fccf-4a5a-b8bb-49ef3110fdba" />
 
 - Expand game catalog and volatility profiles
 - In-app tournaments and prizes (Livepeer streams + leaderboards)
