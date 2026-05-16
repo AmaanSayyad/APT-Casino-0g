@@ -2,7 +2,13 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
+import {
+  buildChatInsert,
+  buildChatInsertFallback,
+  isWalletColumnError,
+  normalizeChatRow,
+} from "@/lib/supabaseChat";
 import { useAccount } from 'wagmi';
 
 function normalizeWalletAddress(account) {
@@ -29,27 +35,41 @@ export default function LiveChat({ open, onClose }) {
   const walletAddr = address || "guest";
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const [chatError, setChatError] = useState("");
   const bottomRef = useRef(null);
   const [minimized, setMinimized] = useState(true);
 
   useEffect(() => {
     if (!open) return;
+    if (!isSupabaseConfigured) {
+      setChatError("Chat unavailable: Supabase env vars not configured.");
+      return;
+    }
     let channel;
     let poller;
     (async () => {
-      const { data } = await supabase
+      setChatError("");
+      const { data, error } = await supabase
         .from('chat_messages')
         .select('id, wallet_address, content, created_at')
         .order('created_at', { ascending: true })
         .limit(200);
-      setMessages(data || []);
+      if (error) {
+        setChatError(
+          error.message.includes('wallet_address')
+            ? 'Chat schema mismatch — run supabase/fix-schema.sql in Supabase SQL Editor.'
+            : error.message
+        );
+        return;
+      }
+      setMessages((data || []).map(normalizeChatRow));
 
       // Try realtime if available
       try {
         channel = supabase
           .channel('public:chat_messages')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload) => {
-            setMessages((prev) => [...prev, payload.new]);
+            setMessages((prev) => [...prev, normalizeChatRow(payload.new)]);
           })
           .subscribe();
       } catch {}
@@ -57,12 +77,12 @@ export default function LiveChat({ open, onClose }) {
       // Fallback polling every 1s when replication not active
       const fetchLatest = async () => {
         try {
-          const { data: d } = await supabase
+          const { data: d, error: pollErr } = await supabase
             .from('chat_messages')
             .select('id, wallet_address, content, created_at')
             .order('created_at', { ascending: true })
             .limit(200);
-          if (Array.isArray(d)) setMessages(d);
+          if (!pollErr && Array.isArray(d)) setMessages(d.map(normalizeChatRow));
         } catch {}
       };
       poller = setInterval(fetchLatest, 1000);
@@ -85,9 +105,28 @@ export default function LiveChat({ open, onClose }) {
     setText("");
     const temp = { id: `temp-${Date.now()}`, wallet_address: walletAddr, content, created_at: new Date().toISOString() };
     setMessages((prev) => [...prev, temp]);
-    const { data, error } = await supabase.from('chat_messages').insert({ content, wallet_address: walletAddr }).select();
-    if (!error && Array.isArray(data) && data[0]) {
-      const real = data[0];
+    setChatError("");
+
+    let result = await supabase
+      .from('chat_messages')
+      .insert(buildChatInsert(walletAddr, content))
+      .select();
+
+    if (result.error && isWalletColumnError(result.error)) {
+      result = await supabase
+        .from('chat_messages')
+        .insert(buildChatInsertFallback(walletAddr, content))
+        .select();
+    }
+
+    if (result.error) {
+      setChatError(result.error.message);
+      setMessages((prev) => prev.filter((m) => m.id !== temp.id));
+      return;
+    }
+
+    if (Array.isArray(result.data) && result.data[0]) {
+      const real = normalizeChatRow(result.data[0]);
       setMessages((prev) => prev.map((m) => (m.id === temp.id ? real : m)));
     }
   }
@@ -108,6 +147,9 @@ export default function LiveChat({ open, onClose }) {
             <button className="text-white/60 hover:text-white" onClick={onClose}>✕</button>
           </div>
         </div>
+        {chatError && (
+          <p className="px-3 py-2 text-xs text-red-300 border-b border-red-500/30">{chatError}</p>
+        )}
         {!minimized && (
         <div className="p-3 h-[360px] overflow-y-auto space-y-2">
           {messages.map((m) => (
