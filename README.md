@@ -2,12 +2,16 @@
 
 **0G Bridge Wave 3:** GameFi casino on **0G Mainnet** (chain ID `16661`).
 
-- **Live:** https://apt-casino-0g-gamma.vercel.app
-- **Wave 3 proof:** https://apt-casino-0g-gamma.vercel.app/0g · [WAVE3.md](./WAVE3.md)
-- **GameLogger (mainnet):** [0xac13628e37628E8e8d9238F1564841cf220742a3](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3)
-- **On-chain activity:** [proof tx](https://chainscan.0g.ai/tx/0x7fac1648037a0d11b0716d93f05cfa5bc0abc352d2318ad5ef124d824f772520)
-
-### Demo Video: https://youtu.be/1QGwBnbokOw
+| Resource | Link |
+|---|---|
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Proof API | [https://apt-casino-0g-gamma.vercel.app/api/wave3-proof](https://apt-casino-0g-gamma.vercel.app/api/wave3-proof) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
+| GitHub | [https://github.com/AmaanSayyad/APT-Casino-0g](https://github.com/AmaanSayyad/APT-Casino-0g) |
+| GameLogger (mainnet) | [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3) |
+| On-chain activity | [proof tx](https://chainscan.0g.ai/tx/0x7fac1648037a0d11b0716d93f05cfa5bc0abc352d2318ad5ef124d824f772520) |
+| Wave 3 notes | [WAVE3.md](./WAVE3.md) |
  
 A couple of days back, I was was on etherscan exploring some transactions and saw an advertisement of https://stake.com/ which was giving 200% bonus on first deposit, I deposited 120 USDT into stake.com they gave 360 USDT as total balance in their controlled custodial wallet and when I started playing casino games I was shocked to see that I was only able to play with $1 per game and was unable to increase the betting amount beyond $1 coz and when I tried to explore and play other games on the platform the issue was persisting, I reached the customer support and got to know that this platform has cheated him under the name of wager limits as I was using the bonus scheme of 200%.
 
@@ -254,7 +258,12 @@ sequenceDiagram
 
 ## 📣 Links
 
-- **Live (Vercel):** https://apt-casino-0g-gamma.vercel.app/
-- **Wave 3 proof:** https://apt-casino-0g-gamma.vercel.app/0g
-- **Pitch/Slides:** https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1 
-- **Demo Video:** https://youtu.be/1QGwBnbokOw
+| Resource | Link |
+|---|---|
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Proof API | [https://apt-casino-0g-gamma.vercel.app/api/wave3-proof](https://apt-casino-0g-gamma.vercel.app/api/wave3-proof) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
+| GitHub | [https://github.com/AmaanSayyad/APT-Casino-0g](https://github.com/AmaanSayyad/APT-Casino-0g) |
+| Pitch / slides | [Figma deck](https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1) |
+| GameLogger | [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3) |

@@ -1,6 +1,12 @@
 # Pyth Entropy Randomness Logic Documentation
 
-**Wave 3:** Games still use Pyth Entropy on Arbitrum Sepolia for RNG; results are then logged to **0G Mainnet** via `GameLogger`. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
+**Wave 3:** Games still use Pyth Entropy on Arbitrum Sepolia for RNG; results are then logged to **0G Mainnet** via `GameLogger`.
+
+| Resource | Link |
+|---|---|
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 
 ## Overview
 This document explains the complete Pyth Entropy randomness implementation in the APT Casino project. The system uses Pyth Network's entropy service to generate verifiable random numbers for casino games.

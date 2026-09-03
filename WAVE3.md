@@ -4,12 +4,15 @@ Provably fair GameFi casino on 0G Mainnet with Compute, Storage, and DA.
 
 ## Project Information
 
-- **Name:** APT-Casino
-- **One-liner:** Non-custodial casino that logs every game on 0G Chain and uses 0G Compute, Storage, and DA for AI + auditability.
-- **Demo Video:** https://youtu.be/1QGwBnbokOw
-- **Live app:** https://apt-casino-0g-gamma.vercel.app
-- **Wave 3 proof page:** https://apt-casino-0g-gamma.vercel.app/0g
-- **Proof API:** https://apt-casino-0g-gamma.vercel.app/api/wave3-proof
+| Resource | Link |
+|---|---|
+| Name | APT-Casino |
+| One-liner | Non-custodial casino that logs every game on 0G Chain and uses 0G Compute, Storage, and DA for AI + auditability. |
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Proof API | [https://apt-casino-0g-gamma.vercel.app/api/wave3-proof](https://apt-casino-0g-gamma.vercel.app/api/wave3-proof) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
+| GitHub | [https://github.com/AmaanSayyad/APT-Casino-0g](https://github.com/AmaanSayyad/APT-Casino-0g) |
 
 ## Problem
 
@@ -80,8 +83,13 @@ npm run deploy:game-logger:mainnet
 
 ## Demo
 
-- **Demo video:** https://youtu.be/1QGwBnbokOw
-- Judges can open `/0g` for live mainnet contract + explorer links.
+| Resource | Link |
+|---|---|
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Proof API | [https://apt-casino-0g-gamma.vercel.app/api/wave3-proof](https://apt-casino-0g-gamma.vercel.app/api/wave3-proof) |
+
+Judges can open `/0g` for live mainnet contract and explorer links.
 
 ## What was verified on mainnet
 

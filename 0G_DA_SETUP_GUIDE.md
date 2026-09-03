@@ -2,7 +2,13 @@
 
 Complete guide for integrating and using 0G DA in the casino application.
 
-**Wave 3:** Casino chain is 0G Mainnet (`16661`). DA client is optional/local. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
+**Wave 3:** Casino chain is 0G Mainnet (`16661`). DA client is optional/local.
+
+| Resource | Link |
+|---|---|
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 
 ## Table of Contents
 

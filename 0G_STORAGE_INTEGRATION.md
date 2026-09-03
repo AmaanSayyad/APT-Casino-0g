@@ -2,7 +2,13 @@
 
 Complete integration guide for 0G Storage in the casino application.
 
-**Wave 3:** App is on **0G Mainnet**. Storage indexer: `https://indexer-storage-turbo.0g.ai`. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
+**Wave 3:** App is on **0G Mainnet**. Storage indexer: `https://indexer-storage-turbo.0g.ai`.
+
+| Resource | Link |
+|---|---|
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 
 ## Overview
 

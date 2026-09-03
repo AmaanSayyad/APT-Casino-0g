@@ -2,7 +2,14 @@
 
 Complete architecture diagram showing how all 0G services are integrated into the casino application.
 
-**Wave 3 (0G Mainnet):** chain ID `16661` · live app https://apt-casino-0g-gamma.vercel.app · proof https://apt-casino-0g-gamma.vercel.app/0g · demo https://youtu.be/1QGwBnbokOw · GameLogger [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3)
+**Wave 3 (0G Mainnet):** chain ID `16661`.
+
+| Resource | Link |
+|---|---|
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
+| GameLogger | [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3) |
 
 ## System Architecture Diagram
 

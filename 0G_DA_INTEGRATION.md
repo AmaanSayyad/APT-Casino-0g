@@ -2,7 +2,13 @@
 
 This documentation explains how 0G DA is integrated into the casino application.
 
-**Wave 3:** 0G Chain is on mainnet. DA may remain on a testnet/local client. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
+**Wave 3:** 0G Chain is on mainnet. DA may remain on a testnet/local client.
+
+| Resource | Link |
+|---|---|
+| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
+| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 
 **For detailed setup guide, see:** [0G_DA_SETUP_GUIDE.md](./0G_DA_SETUP_GUIDE.md)
 
