@@ -1,0 +1,19 @@
+{
+  "contractAddress": "0xac13628e37628E8e8d9238F1564841cf220742a3",
+  "deploymentTx": "0xcb23b1adcab5cfecec10e952bde9887921a647d812d5b729728d8d138b6d3f8f",
+  "proofTx": "0x7fac1648037a0d11b0716d93f05cfa5bc0abc352d2318ad5ef124d824f772520",
+  "proofGameId": "wave3_mainnet_1788430085009",
+  "owner": "0xF7249B507F1f89Eaea5d694cEf5cb96F245Bc5b6",
+  "chainId": 16661,
+  "network": "0g-mainnet",
+  "explorer": {
+    "contract": "https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3",
+    "deployTx": "https://chainscan.0g.ai/tx/0xcb23b1adcab5cfecec10e952bde9887921a647d812d5b729728d8d138b6d3f8f",
+    "proofTx": "https://chainscan.0g.ai/tx/0x7fac1648037a0d11b0716d93f05cfa5bc0abc352d2318ad5ef124d824f772520"
+  },
+  "blocks": {
+    "deploy": 43395250,
+    "proof": 43395260
+  },
+  "deployedAt": "2026-09-03T10:08:12.829Z"
+}

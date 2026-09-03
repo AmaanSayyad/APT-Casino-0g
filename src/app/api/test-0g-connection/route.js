@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '@/config/treasury.js';
 
 export async function GET() {
   try {
     console.log('🧪 Testing 0G Network connection...');
     
-    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc.0g.ai';
+    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai';
     console.log('🔧 RPC URL:', ogRpcUrl);
     
     // Test 1: Create provider
@@ -33,7 +33,7 @@ export async function GET() {
     // Test 3: Create treasury wallet
     let treasuryWallet;
     try {
-      treasuryWallet = new ethers.Wallet(requireTreasuryPrivateKey(), provider);
+      treasuryWallet = new ethers.Wallet(getTreasuryPrivateKey(), provider);
       console.log('✅ Treasury wallet created:', treasuryWallet.address);
     } catch (error) {
       console.error('❌ Wallet creation failed:', error);

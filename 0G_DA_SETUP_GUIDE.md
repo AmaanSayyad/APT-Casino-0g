@@ -2,7 +2,7 @@
 
 Complete guide for integrating and using 0G DA in the casino application.
 
-**Live app:** https://apt-casino-0g-gamma.vercel.app/ · **Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Wave 3:** Casino chain is 0G Mainnet (`16661`). DA client is optional/local. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ Complete guide for integrating and using 0G DA in the casino application.
 
 - Node.js >= 18.0.0
 - Docker (for DA Client node)
-- OG in treasury wallet on 0G Mainnet and/or Galileo (for DA gas and player withdrawals)
+- 0G tokens in treasury wallet (for gas fees)
 - Basic knowledge of gRPC and blockchain concepts
 
 ## Installation
@@ -54,23 +54,21 @@ npm list @grpc/grpc-js @grpc/proto-loader
 
 ### Environment Variables
 
-Copy [`.env.example`](./.env.example) to `.env` and add:
+Add the following to your `.env.local` file:
 
 ```bash
 # 0G DA Client URL (gRPC endpoint)
 NEXT_PUBLIC_0G_DA_CLIENT_URL=http://localhost:51001
 
-# 0G Mainnet (16661) — use for production DA client
-NEXT_PUBLIC_0G_MAINNET_RPC=https://evmrpc.0g.ai
+# 0G Network RPC (for DA contract interactions)
+NEXT_PUBLIC_0G_RPC_URL=https://evmrpc-testnet.0g.ai
 
-# 0G Galileo Testnet (16602) — use for test DA client
-NEXT_PUBLIC_0G_GALILEO_RPC=https://evmrpc-testnet.0g.ai
-
-# Treasury (must match TREASURY_ADDRESS / NEXT_PUBLIC_TREASURY_ADDRESS)
+# Treasury Private Key (for DA submissions)
 TREASURY_PRIVATE_KEY=your_private_key_here
-```
 
-The app supports both **0G Mainnet** and **Galileo Testnet**. Point your DA client `COMBINED_SERVER_CHAIN_RPC` at the same network you use for treasury operations.
+# Network selection (TESTNET or MAINNET)
+NEXT_PUBLIC_NETWORK=TESTNET
+```
 
 ### Configuration Files
 
@@ -448,7 +446,7 @@ Check DA Client node status.
    curl http://localhost:51001/health
    ```
 
-5. Update `NEXT_PUBLIC_0G_DA_CLIENT_URL` in `.env`
+5. Update `NEXT_PUBLIC_0G_DA_CLIENT_URL` in `.env.local`
 
 ### Blob Size Exceeded
 
@@ -522,10 +520,8 @@ docker run -d \
 ```bash
 # Production .env
 NEXT_PUBLIC_0G_DA_CLIENT_URL=http://your-da-client:51001
-NEXT_PUBLIC_0G_MAINNET_RPC=https://evmrpc.0g.ai
-NEXT_PUBLIC_TREASURY_ADDRESS=0xYourTreasuryAddress
-TREASURY_ADDRESS=0xYourTreasuryAddress
-TREASURY_PRIVATE_KEY=your_private_key_here
+NEXT_PUBLIC_0G_RPC_URL=https://evmrpc.0g.ai
+NEXT_PUBLIC_NETWORK=MAINNET
 ```
 
 ### 3. Monitoring
@@ -571,16 +567,13 @@ This will:
 
 ## Additional Resources
 
-- [Live App (Vercel)](https://apt-casino-0g-gamma.vercel.app/)
-- [Demo Video](https://youtu.be/V5e2zKgOQPo)
-- [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G DA Technical Deep Dive](0g-doc-main/docs/developer-hub/building-on-0g/da-deep-dive.md)
 - [DA Integration Guide](0g-doc-main/docs/developer-hub/building-on-0g/da-integration.md)
 - [0G DA Example Repository](https://github.com/0gfoundation/0g-da-example-rust)
 
 ---
 
-**Last Updated:** May 2026  
-**Version:** 1.1.0  
+**Last Updated:** November 2024  
+**Version:** 1.0.0  
 **Status:** Production Ready
 

@@ -1,13 +1,41 @@
-> **Note:** This file documents an earlier **Aptos Move** module layout. The current app uses **EVM on 0G** (wagmi, treasury EOA, optional `GameLogger` Solidity contract). For setup and env vars, see [README.md](./README.md) and [`.env.example`](./.env.example).
+# Historical Aptos module notes
+
+These addresses are from an earlier Aptos Move version of the casino. The live Wave 3 app is **EVM on 0G Mainnet**.
+
+- **Live:** https://apt-casino-0g-gamma.vercel.app
+- **Demo:** https://youtu.be/1QGwBnbokOw
+- **0G GameLogger:** [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3)
 
 ---
 
-## Current EVM deployment (0G)
-
-| Item | Command / location |
-|------|------------------|
-| Live app (Vercel) | https://apt-casino-0g-gamma.vercel.app/ |
-| GameLogger on 0G | `npm run deploy:game-logger:mainnet` or `deploy:game-logger` (Galileo) |
-| Pyth entropy consumer | `npm run deploy:pyth-entropy` (Arbitrum Sepolia) |
-| Treasury | Set `TREASURY_ADDRESS` + `TREASURY_PRIVATE_KEY` in `.env` |
-| Mainnet GameLogger (deployed) | `0xaca996a4d49e7ed42da68a20600f249be6d024a4` — set `NEXT_PUBLIC_GAME_LOGGER_CONTRACT_MAINNET` |
+Module address (apt_casino): 0x421055ba162a1f697532e79ea9a6852422d311f0993eb880c75110218d7f52c0
+Roulette: 0x4210...f52c0::roulette
+Mines: 0x4210...f52c0::mines
+Wheel: 0x4210...f52c0::wheel
+Frontend entegrasyonu için fonksiyon imzaları:
+Roulette:
+0x...::roulette::deposit(user: &signer, amount: u64, house_addr: address)
+0x...::roulette::request_withdraw(user: &signer, amount: u64)
+0x...::roulette::admin_payout(admin: &signer, to: address, amount: u64)
+0x...::roulette::user_place_bet(user: &signer, amount: u64, bet_kind: u8, bet_value: u8)
+0x...::roulette::house_place_bet(admin: &signer, player: address, amount: u64, bet_kind: u8, bet_value: u8)
+Mines:
+0x...::mines::deposit(user: &signer, amount: u64, house_addr: address)
+0x...::mines::request_withdraw(user: &signer, amount: u64)
+0x...::mines::admin_payout(admin: &signer, to: address, amount: u64)
+0x...::mines::user_play(user: &signer, amount: u64, pick: u8)
+0x...::mines::house_play(admin: &signer, player: address, amount: u64, pick: u8)
+Wheel:
+0x...::wheel::deposit(user: &signer, amount: u64, house_addr: address)
+0x...::wheel::request_withdraw(user: &signer, amount: u64)
+0x...::wheel::admin_payout(admin: &signer, to: address, amount: u64)
+0x...::wheel::user_spin(user: &signer, amount: u64, sectors: u8)
+0x...::wheel::house_spin(admin: &signer, player: address, amount: u64, sectors: u8)
+User_Balance
+demo liquidity provider
+Plinko:
+0x...::plinko::deposit(user: &signer, amount: u64, house_addr: address)
+0x...::plinko::request_withdraw(user: &signer, amount: u64)
+0x...::plinko::admin_payout(admin: &signer, to: address, amount: u64)
+0x...::plinko::user_plinko(user: &signer, amount: u64, sectors: u8)
+0x...::plinko::house_plinko(admin: &signer, player: address, amount: u64, sectors: u8)

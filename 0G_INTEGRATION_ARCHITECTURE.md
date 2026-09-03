@@ -2,8 +2,7 @@
 
 Complete architecture diagram showing how all 0G services are integrated into the casino application.
 
-**Networks:** 0G Mainnet (`16661`) + Galileo Testnet (`16602`) for gaming/treasury; Arbitrum Sepolia (`421614`) for Pyth Entropy. **Env:** [`.env.example`](./.env.example)  
-**Live app:** https://apt-casino-0g-gamma.vercel.app/ · **Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Wave 3 (0G Mainnet):** chain ID `16661` · live app https://apt-casino-0g-gamma.vercel.app · proof https://apt-casino-0g-gamma.vercel.app/0g · demo https://youtu.be/1QGwBnbokOw · GameLogger [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3)
 
 ## System Architecture Diagram
 
@@ -30,7 +29,7 @@ graph TB
         DAService[OGDAService]
     end
 
-    subgraph OGChain["0G Chain (Galileo Testnet)"]
+    subgraph OGChain["0G Chain (Mainnet)"]
         ChainRPC[0G Chain RPC]
         Contracts[Smart Contracts]
         Treasury[Treasury Wallet]
@@ -315,8 +314,8 @@ graph TB
         API[API Routes]
     end
 
-    subgraph OGChain["0G Chain (Mainnet or Galileo)"]
-        Chain[0G Chain<br/>Mainnet: evmrpc.0g.ai<br/>Galileo: evmrpc-testnet.0g.ai]
+    subgraph OGTestnet["0G Testnet"]
+        Chain[0G Chain<br/>RPC: evmrpc-testnet.0g.ai]
         ComputeNet[Compute Network<br/>Broker + Providers]
         DANet[DA Network<br/>Client + Encoder + Retriever]
         StorageNet[Storage Network<br/>Indexer + Nodes]
@@ -346,7 +345,7 @@ graph TB
     Chain --> DANet
     Chain --> StorageNet
 
-    style OGChain fill:#4a90e2
+    style OGTestnet fill:#4a90e2
     style Arbitrum fill:#28a745
     style Database fill:#ffc107
 ```
@@ -456,10 +455,9 @@ src/
 ## Key Integration Points
 
 ### 1. 0G Chain
-- **Purpose**: Primary blockchain for deposits, withdrawals, and optional on-chain logging
-- **Usage**: Treasury wallet (EOA), `GameLogger` contract, DA/Storage txs
-- **Networks**: 0G Mainnet (`16661`, `https://evmrpc.0g.ai`) and Galileo Testnet (`16602`, `https://evmrpc-testnet.0g.ai`)
-- **Treasury**: Set `NEXT_PUBLIC_TREASURY_ADDRESS` / `TREASURY_ADDRESS` in `.env` (see `.env.example`)
+- **Purpose**: Primary blockchain for all transactions
+- **Usage**: Treasury wallet operations, contract interactions
+- **RPC**: `https://evmrpc.0g.ai` (0G Mainnet, chain ID 16661)
 
 ### 2. 0G Compute Network
 - **Purpose**: AI inference services
@@ -482,18 +480,15 @@ src/
 
 ## Environment Variables
 
-Copy [`.env.example`](./.env.example) to `.env`. Key variables for 0G integrations:
-
 ```bash
-# 0G Mainnet + Galileo
-NEXT_PUBLIC_0G_MAINNET_RPC=https://evmrpc.0g.ai
-NEXT_PUBLIC_0G_GALILEO_RPC=https://evmrpc-testnet.0g.ai
-NEXT_PUBLIC_TREASURY_ADDRESS=
-TREASURY_ADDRESS=
-TREASURY_PRIVATE_KEY=
+# 0G Chain
+NEXT_PUBLIC_0G_RPC_URL=https://evmrpc.0g.ai
+NEXT_PUBLIC_0G_MAINNET_RPC_URL=https://evmrpc.0g.ai
+NEXT_PUBLIC_GAME_LOGGER_CONTRACT=0xac13628e37628E8e8d9238F1564841cf220742a3
+TREASURY_PRIVATE_KEY=your_private_key
 
-# 0G Compute (AI assistant — Bank → AI Compute tab)
-# Broker uses ogComputeNetwork.js (mainnet-first)
+# 0G Compute
+NEXT_PUBLIC_0G_COMPUTE_NETWORK=testnet
 
 # 0G DA
 NEXT_PUBLIC_0G_DA_CLIENT_URL=http://localhost:51001
@@ -502,17 +497,10 @@ NEXT_PUBLIC_0G_DA_CLIENT_URL=http://localhost:51001
 NEXT_PUBLIC_0G_STORAGE_INDEXER_RPC=https://indexer-storage-turbo.0g.ai
 NEXT_PUBLIC_0G_FLOW_CONTRACT=0x...
 NEXT_PUBLIC_0G_KV_CLIENT_ENDPOINT=http://...
-
-# Optional: on-chain game logs on 0G Mainnet
-NEXT_PUBLIC_GAME_LOGGER_CONTRACT_MAINNET=0xaca996a4d49e7ed42da68a20600f249be6d024a4
-
-# Pyth Entropy (Arbitrum Sepolia — separate from 0G gaming chain)
-NEXT_PUBLIC_ORACLE_RPC_URL=https://sepolia-rollup.arbitrum.io/rpc
-NEXT_PUBLIC_PYTH_ENTROPY_CONTRACT=0x549ebba8036ab746611b4ffa1423eb0a4df61440
 ```
 
 ---
 
-**Last Updated**: May 2026  
-**Version**: 1.1.0
+**Last Updated**: November 2024  
+**Version**: 1.0.0
 

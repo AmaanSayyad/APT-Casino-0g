@@ -10,7 +10,7 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import { ZgFile, Indexer } from '@0glabs/0g-ts-sdk';
 import { ethers } from 'ethers';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '@/config/treasury.js';
 import { 
   getCurrentStorageNetworkConfig,
   OG_STORAGE_SETTINGS,
@@ -32,7 +32,7 @@ async function initializeStorage() {
     
     // Initialize provider and signer
     const provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
-    signer = new ethers.Wallet(requireTreasuryPrivateKey(), provider);
+    signer = new ethers.Wallet(getTreasuryPrivateKey(), provider);
     
     // Initialize indexer
     indexer = new Indexer(networkConfig.indexerRpc);

@@ -3,8 +3,9 @@
  * Handles random number generation using Pyth Network Entropy via API
  */
 
-import { ethers, JsonRpcProvider, Contract, AbiCoder } from 'ethers';
-import PYTH_ENTROPY_CONFIG, { normalizeEntropyNetworkKey } from '../config/pythEntropy.js';
+import { ethers, BrowserProvider, JsonRpcProvider, Contract, AbiCoder, Wallet } from 'ethers';
+import PYTH_ENTROPY_CONFIG from '../config/pythEntropy.js';
+import { getTreasuryPrivateKey } from '../config/treasury.js';
 
 class PythEntropyService {
   constructor() {
@@ -30,7 +31,7 @@ class PythEntropyService {
 
   /**
    * Initialize the Pyth Entropy service
-   * @param {string} network - Config key from pythEntropy (e.g. oracle testnet)
+   * @param {string} network - Network name (arbitrum-sepolia, base, etc.)
    */
   async initialize(network = null) {
     try {
@@ -38,7 +39,7 @@ class PythEntropyService {
         return true;
       }
 
-      this.network = normalizeEntropyNetworkKey(network || PYTH_ENTROPY_CONFIG.DEFAULT_NETWORK);
+      this.network = network || PYTH_ENTROPY_CONFIG.DEFAULT_NETWORK;
       const networkConfig = PYTH_ENTROPY_CONFIG.getNetworkConfig(this.network);
       
       if (!networkConfig) {
@@ -50,9 +51,15 @@ class PythEntropyService {
 
       // Use treasury wallet for signing instead of user wallet
       this.provider = new JsonRpcProvider(networkConfig.rpcUrl);
-
-      // Read-only contract (signing happens server-side via /api/generate-entropy)
-      this.signer = null;
+      
+      // Create treasury wallet for signing transactions
+      if (getTreasuryPrivateKey()) {
+        this.signer = new Wallet(getTreasuryPrivateKey(), this.provider);
+        console.log('🏦 PYTH ENTROPY: Using treasury wallet for signing');
+        console.log(`📍 Treasury address: ${this.signer.address}`);
+      } else {
+        console.warn('⚠️ PYTH ENTROPY: Treasury private key not found, using read-only provider');
+      }
 
       // Get contract address for the network
       const contractAddress = PYTH_ENTROPY_CONFIG.getEntropyContract(this.network);
@@ -70,7 +77,7 @@ class PythEntropyService {
       this.contract = new Contract(
         contractAddress,
         this.contractABI,
-        this.provider
+        this.signer || this.provider
       );
 
       console.log(`🔍 DEBUG: Contract created:`, !!this.contract);
@@ -133,7 +140,7 @@ class PythEntropyService {
         gameConfig: gameConfig,
         metadata: {
           source: 'Pyth Entropy (API)',
-          network: this.network,
+          network: 'arbitrum-sepolia',
           algorithm: 'pyth-entropy-hardhat',
           generatedAt: new Date().toISOString()
         }
@@ -151,13 +158,7 @@ class PythEntropyService {
       );
       
       const fallbackSequenceNumber = (Date.now() + Math.floor(Math.random() * 1000)).toString();
-      const net = this.network || PYTH_ENTROPY_CONFIG.DEFAULT_NETWORK;
-      const netCfg = PYTH_ENTROPY_CONFIG.getNetworkConfig(net);
-      const slug = process.env.NEXT_PUBLIC_PYTH_CHAIN_SLUG || '';
-      const dashUrl = slug
-        ? `https://entropy-explorer.pyth.network/?chain=${encodeURIComponent(slug)}`
-        : 'https://entropy-explorer.pyth.network/';
-
+      
       return {
         randomValue: Math.floor(Math.random() * 1000000),
         entropyProof: {
@@ -166,9 +167,9 @@ class PythEntropyService {
           transactionHash: 'fallback_no_tx',
           blockNumber: null,
           randomValue: Math.floor(Math.random() * 1000000),
-          network: net,
-          explorerUrl: dashUrl,
-          txExplorerUrl: netCfg?.explorerUrl ? `${String(netCfg.explorerUrl).replace(/\/$/, '')}/` : '',
+          network: 'arbitrum-sepolia',
+          explorerUrl: 'https://entropy-explorer.pyth.network/?chain=arbitrum-sepolia',
+          arbiscanUrl: 'https://sepolia.arbiscan.io/',
           timestamp: Date.now(),
           source: 'Pyth Entropy (API Fallback)'
         },
@@ -177,7 +178,7 @@ class PythEntropyService {
         gameConfig: gameConfig,
         metadata: {
           source: 'Pyth Entropy (Fallback)',
-          network: net,
+          network: 'arbitrum-sepolia',
           algorithm: 'fallback',
           generatedAt: new Date().toISOString()
         }
@@ -186,15 +187,20 @@ class PythEntropyService {
   }
 
   /**
-   * Explorer URL for the chain where entropy txs are confirmed
-   * @param {string} txHash
-   * @returns {string}
+   * Get Arbiscan URL for transaction
+   * @param {string} txHash - Transaction hash
+   * @returns {string} Arbiscan URL
    */
-  getTxExplorerUrl(txHash) {
-    const network = normalizeEntropyNetworkKey(this.network || PYTH_ENTROPY_CONFIG.DEFAULT_NETWORK);
-    const cfg = PYTH_ENTROPY_CONFIG.getNetworkConfig(network);
-    const base = cfg?.explorerUrl ? String(cfg.explorerUrl).replace(/\/$/, '') : '';
-    return base ? `${base}/tx/${txHash}` : '';
+  getArbiscanUrl(txHash) {
+    const network = this.network || 'arbitrum-sepolia';
+    
+    if (network === 'arbitrum-sepolia') {
+      return `https://sepolia.arbiscan.io/tx/${txHash}`;
+    } else if (network === 'arbitrum-one') {
+      return `https://arbiscan.io/tx/${txHash}`;
+    }
+    
+    return `https://sepolia.etherscan.io/tx/${txHash}`;
   }
 
   /**

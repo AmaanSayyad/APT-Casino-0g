@@ -1,58 +1,112 @@
 /**
  * 0G Storage Configuration
+ * Configuration for 0G Storage network integration
  */
 
+// 0G Storage Network Configuration
 export const OG_STORAGE_CONFIG = {
-  // 0G Storage Network endpoints
-  rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
-  storageUrl: process.env.NEXT_PUBLIC_0G_STORAGE_INDEXER || 'https://indexer-storage-turbo.0g.ai',
+  // Testnet configuration
+  testnet: {
+    rpcUrl: process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc-testnet.0g.ai',
+    indexerRpc: process.env.NEXT_PUBLIC_0G_STORAGE_INDEXER_RPC || 'https://indexer-storage-testnet-turbo.0g.ai',
+    networkName: '0G Testnet',
+    chainId: 16602,
+  },
   
-  // Network configuration
-  chainId: 16661,
-  networkName: '0G Mainnet',
+  // Mainnet configuration
+  mainnet: {
+    rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC_URL || 'https://evmrpc.0g.ai',
+    indexerRpc: process.env.NEXT_PUBLIC_0G_STORAGE_INDEXER_RPC || 'https://indexer-storage-turbo.0g.ai',
+    networkName: '0G Mainnet',
+    chainId: 16661,
+  },
+};
+
+// Storage Configuration
+export const OG_STORAGE_SETTINGS = {
+  // Default segment number for node selection
+  DEFAULT_SEGMENT_NUMBER: 1,
   
-  // Storage specific settings
-  maxFileSize: 10 * 1024 * 1024, // 10MB max
-  timeout: 60000, // 60 seconds
-  retries: 3,
+  // Default number of replicas
+  DEFAULT_REPLICAS: 3,
   
-  // Storage nodes
-  storageNodes: [
-    'https://indexer-storage-turbo.0g.ai'
-  ],
+  // Maximum file size (in bytes) - 0G supports large files
+  MAX_FILE_SIZE: 10 * 1024 * 1024 * 1024, // 10 GB
   
-  // File settings
-  supportedTypes: [
-    'application/json',
-    'text/plain',
-    'image/jpeg',
-    'image/png',
-    'application/pdf'
-  ]
+  // Recommended chunk size for large uploads
+  RECOMMENDED_CHUNK_SIZE: 10 * 1024 * 1024, // 10 MB
+  
+  // Upload timeout (in milliseconds)
+  UPLOAD_TIMEOUT: 300000, // 5 minutes
+  
+  // Download timeout (in milliseconds)
+  DOWNLOAD_TIMEOUT: 300000, // 5 minutes
+  
+  // Enable Merkle proof verification by default
+  DEFAULT_VERIFY_PROOF: true,
+  
+  // Retry configuration
+  MAX_RETRIES: 3,
+  RETRY_DELAY: 2000, // 2 seconds
+};
+
+// Storage Paths for Different Data Types
+export const OG_STORAGE_PATHS = {
+  // Game assets
+  GAME_ASSETS: 'game-assets',
+  GAME_IMAGES: 'game-assets/images',
+  GAME_SOUNDS: 'game-assets/sounds',
+  GAME_ANIMATIONS: 'game-assets/animations',
+  
+  // User data
+  USER_PROFILES: 'user-profiles',
+  USER_AVATARS: 'user-profiles/avatars',
+  USER_SETTINGS: 'user-profiles/settings',
+  
+  // Tournament data
+  TOURNAMENTS: 'tournaments',
+  TOURNAMENT_LEADERBOARDS: 'tournaments/leaderboards',
+  TOURNAMENT_RESULTS: 'tournaments/results',
+  
+  // Game history backups
+  GAME_HISTORY_BACKUPS: 'game-history/backups',
+  GAME_HISTORY_ARCHIVES: 'game-history/archives',
+  
+  // Analytics data
+  ANALYTICS: 'analytics',
+  ANALYTICS_REPORTS: 'analytics/reports',
+  
+  // KV Storage streams
+  KV_STREAMS: {
+    USER_STATE: 1,
+    GAME_STATE: 2,
+    TOURNAMENT_STATE: 3,
+  },
+};
+
+// Get current network config
+export const getCurrentStorageNetworkConfig = () => {
+  const isMainnet =
+    process.env.NEXT_PUBLIC_NETWORK === 'MAINNET' ||
+    process.env.NEXT_PUBLIC_NETWORK === '0g-mainnet' ||
+    process.env.NEXT_PUBLIC_0G_CHAIN === 'mainnet';
+  return isMainnet 
+    ? OG_STORAGE_CONFIG.mainnet 
+    : OG_STORAGE_CONFIG.testnet;
+};
+
+// Helper to build storage path
+export const buildStoragePath = (category, filename) => {
+  return `${category}/${filename}`;
+};
+
+// Helper to validate file size
+export const validateFileSize = (size) => {
+  if (size > OG_STORAGE_SETTINGS.MAX_FILE_SIZE) {
+    throw new Error(`File size ${size} bytes exceeds maximum ${OG_STORAGE_SETTINGS.MAX_FILE_SIZE} bytes`);
+  }
+  return true;
 };
 
 export default OG_STORAGE_CONFIG;
 
-export const OG_STORAGE_SETTINGS = {
-  DEFAULT_SEGMENT_NUMBER: 0,
-  DEFAULT_REPLICAS: 1,
-  DEFAULT_VERIFY_PROOF: false,
-};
-
-export function validateFileSize(sizeBytes) {
-  if (sizeBytes > OG_STORAGE_CONFIG.maxFileSize) {
-    throw new Error(`File exceeds max size of ${OG_STORAGE_CONFIG.maxFileSize} bytes`);
-  }
-}
-
-export function getCurrentStorageNetworkConfig() {
-  const rpcUrl =
-    process.env.NEXT_PUBLIC_0G_GALILEO_RPC ||
-    process.env.NEXT_PUBLIC_0G_MAINNET_RPC ||
-    OG_STORAGE_CONFIG.rpcUrl;
-  return {
-    rpcUrl,
-    indexerRpc: process.env.NEXT_PUBLIC_0G_STORAGE_INDEXER || OG_STORAGE_CONFIG.storageUrl,
-    networkName: OG_STORAGE_CONFIG.networkName,
-  };
-}

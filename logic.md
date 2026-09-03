@@ -1,6 +1,6 @@
 # Pyth Entropy Randomness Logic Documentation
 
-> Randomness runs on **Arbitrum Sepolia** (not on 0G). Gaming deposits/withdrawals use **0G Mainnet** or **Galileo Testnet**. See [`.env.example`](./.env.example). **Live app:** https://apt-casino-0g-gamma.vercel.app/
+**Wave 3:** Games still use Pyth Entropy on Arbitrum Sepolia for RNG; results are then logged to **0G Mainnet** via `GameLogger`. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
 
 ## Overview
 This document explains the complete Pyth Entropy randomness implementation in the APT Casino project. The system uses Pyth Network's entropy service to generate verifiable random numbers for casino games.
@@ -306,16 +306,12 @@ const gameResult = processor.processEntropy(result.randomValue, {
 
 ## Network Configuration
 
-**Gaming / treasury (0G):**
-- **0G Mainnet** (chain ID `16661`) — deposits, withdrawals, in-app balance
-- **0G Galileo Testnet** (chain ID `16602`) — same flows for testing
-
-Withdrawals use the wallet's connected `chainId` (see `/api/withdraw`).
-
-**Randomness (Pyth Entropy):**
-- **Arbitrum Sepolia** (chain ID `421614`) — primary; configured via `NEXT_PUBLIC_ORACLE_RPC_URL` and `NEXT_PUBLIC_PYTH_ENTROPY_CONTRACT` in `.env`
-
-Env template: [`.env.example`](./.env.example)
+Currently supports:
+- Arbitrum Sepolia (testnet) - Primary
+- Arbitrum One (mainnet) - Planned
+- Base Sepolia (testnet) - Planned
+- Base (mainnet) - Planned
+- Blast (mainnet) - Planned
 
 ## Error Handling
 

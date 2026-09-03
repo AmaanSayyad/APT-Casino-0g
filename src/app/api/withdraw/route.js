@@ -1,127 +1,167 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getOgChainConfig } from '@/config/ogNetwork.js';
 
-const MAINNET_CHAIN_ID  = 16661; // 0x4115
-const TESTNET_CHAIN_ID  = 16602; // 0x40da
-
-function getNetworkForChainId(chainId) {
-  const id = chainId ? parseInt(String(chainId), 10) : null;
-  if (id === TESTNET_CHAIN_ID) {
-    return {
-      rpc:      process.env.NEXT_PUBLIC_0G_GALILEO_RPC     || 'https://evmrpc-testnet.0g.ai',
-      explorer: process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan-galileo.0g.ai',
-      name:     '0G-Galileo-Testnet',
-    };
-  }
-  // Default → mainnet
-  return {
-    rpc:      process.env.NEXT_PUBLIC_0G_MAINNET_RPC      || 'https://evmrpc.0g.ai',
-    explorer: process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER  || 'https://chainscan.0g.ai',
-    name:     '0G-Mainnet',
-  };
-}
+const TREASURY_PRIVATE_KEY = process.env.TREASURY_PRIVATE_KEY || '';
+const chain = getOgChainConfig();
+const provider = new ethers.JsonRpcProvider(chain.rpcUrl);
+const treasuryWallet = TREASURY_PRIVATE_KEY
+  ? new ethers.Wallet(TREASURY_PRIVATE_KEY, provider)
+  : null;
 
 export async function POST(request) {
   try {
-    const privateKey = requireTreasuryPrivateKey();
-
-    const { userAddress, amount, chainId } = await request.json();
-    const network = getNetworkForChainId(chainId);
-    const provider = new ethers.JsonRpcProvider(network.rpc);
-    const treasuryWallet = new ethers.Wallet(privateKey, provider);
-
-    console.log(`💸 Withdraw on ${network.name} (chainId=${chainId ?? 'not sent, defaulting to mainnet'})`)
-
+    const { userAddress, amount } = await request.json();
+    
+    console.log('📥 Received withdrawal request:', { userAddress, amount, type: typeof userAddress });
+    
+    // Validate input
     if (!userAddress || !amount || amount <= 0) {
-      return new Response(JSON.stringify({ error: 'Invalid parameters' }), {
+      return new Response(JSON.stringify({
+        error: 'Invalid parameters'
+      }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
     }
 
-    let treasuryBalance = 0n;
-    try {
-      treasuryBalance = await provider.getBalance(treasuryWallet.address);
-    } catch (balanceError) {
-      console.warn('Could not check treasury balance:', balanceError.message);
-    }
-
-    const amountWei = ethers.parseEther(amount.toString());
-    if (treasuryBalance < amountWei) {
+    if (!TREASURY_PRIVATE_KEY) {
       return NextResponse.json(
-        {
-          error: `Insufficient treasury funds. Available: ${ethers.formatEther(treasuryBalance)} OG, Requested: ${amount} OG`,
-        },
-        { status: 400 }
+        { error: 'Treasury not configured' },
+        { status: 500 }
       );
     }
 
+    console.log(`🏦 Processing withdrawal: ${amount} OG to ${userAddress}`);
+    console.log(`📍 Treasury: ${treasuryWallet.address}`);
+    
+    // Check treasury balance
+    let treasuryBalance = 0;
+    try {
+      treasuryBalance = await provider.getBalance(treasuryWallet.address);
+      console.log(`💰 Treasury balance: ${ethers.formatEther(treasuryBalance)} OG`);
+    } catch (balanceError) {
+      console.log('⚠️ Could not check treasury balance, proceeding with transfer attempt...');
+      console.log('Balance error:', balanceError.message);
+    }
+    
+    // Check if treasury has sufficient funds
+    const amountWei = ethers.parseEther(amount.toString());
+    if (treasuryBalance < amountWei) {
+      return NextResponse.json(
+        { error: `Insufficient treasury funds. Available: ${ethers.formatEther(treasuryBalance)} OG, Requested: ${amount} OG` },
+        { status: 400 }
+      );
+    }
+    
+    // Format user address
     let formattedUserAddress;
     if (typeof userAddress === 'object' && userAddress.data) {
+      // Convert Uint8Array-like object to hex string
       const bytes = Object.values(userAddress.data);
-      formattedUserAddress = '0x' + bytes.map((b) => b.toString(16).padStart(2, '0')).join('');
+      formattedUserAddress = '0x' + bytes.map(b => b.toString(16).padStart(2, '0')).join('');
     } else if (typeof userAddress === 'string') {
       formattedUserAddress = userAddress.startsWith('0x') ? userAddress : `0x${userAddress}`;
     } else {
       throw new Error(`Invalid userAddress format: ${typeof userAddress}`);
     }
-
+    
+    console.log('🔧 Formatted user address:', formattedUserAddress);
+    console.log('🔧 Treasury account:', treasuryWallet.address);
+    console.log('🔧 Amount in Wei:', amountWei.toString());
+    
+    // Send transaction from treasury to user
     const tx = await treasuryWallet.sendTransaction({
       to: formattedUserAddress,
       value: amountWei,
-      gasLimit: process.env.GAS_LIMIT_WITHDRAW ? parseInt(process.env.GAS_LIMIT_WITHDRAW, 10) : 100000,
+      gasLimit: process.env.GAS_LIMIT_WITHDRAW ? parseInt(process.env.GAS_LIMIT_WITHDRAW) : 100000
     });
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        transactionHash: tx.hash,
-        explorerUrl: `${network.explorer}/tx/${tx.hash}`,
-        network: network.name,
-        amount,
-        userAddress,
-        treasuryAddress: treasuryWallet.address,
-        status: 'pending',
-        message: 'Transaction sent successfully. Check the block explorer for confirmation.',
-      }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    
+    console.log(`📤 Transaction sent: ${tx.hash}`);
+    
+    // Return transaction hash immediately without waiting for confirmation
+    // User can check transaction status on Etherscan
+    console.log(`✅ Withdrawal transaction sent: ${amount} OG to ${userAddress}, TX: ${tx.hash}`);
+    
+    return new Response(JSON.stringify({
+      success: true,
+      transactionHash: tx.hash,
+      amount: amount,
+      userAddress: userAddress,
+      treasuryAddress: treasuryWallet.address,
+      status: 'pending',
+      message: 'Transaction sent successfully. Check Etherscan for confirmation.'
+    }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
   } catch (error) {
     console.error('Withdraw API error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // Ensure error message is a string
     const errorMessage = error?.message || 'Unknown error occurred';
     const safeErrorMessage = typeof errorMessage === 'string' ? errorMessage : 'Unknown error occurred';
-    return new Response(JSON.stringify({ error: `Withdrawal failed: ${safeErrorMessage}` }), {
+    
+    return new Response(JSON.stringify({
+      error: `Withdrawal failed: ${safeErrorMessage}`
+    }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   }
 }
 
-export async function GET(request) {
+// GET endpoint to check treasury balance
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const chainId = searchParams.get('chainId');
-    const network = getNetworkForChainId(chainId);
+    if (!TREASURY_PRIVATE_KEY) {
+      return NextResponse.json(
+        { error: 'Treasury not configured' },
+        { status: 500 }
+      );
+    }
 
-    const privateKey = requireTreasuryPrivateKey();
-    const provider = new ethers.JsonRpcProvider(network.rpc);
-    const treasuryWallet = new ethers.Wallet(privateKey, provider);
-    const balance = await provider.getBalance(treasuryWallet.address);
-
-    return NextResponse.json({
-      treasuryAddress: treasuryWallet.address,
-      balance: ethers.formatEther(balance),
-      balanceWei: balance.toString(),
-      network: network.name,
-    });
+    const treasuryAccount = new EthereumAccount(
+      new Uint8Array(Buffer.from(TREASURY_PRIVATE_KEY.slice(2), 'hex'))
+    );
+    
+    const coinClient = new CoinClient(client);
+    
+    try {
+      const balance = await coinClient.checkBalance(treasuryAccount);
+      
+      return NextResponse.json({
+        treasuryAddress: treasuryAccount.address().hex(),
+        balance: balance / 100000000, // Convert to OG
+        balanceOctas: balance.toString(),
+        status: 'active'
+      });
+    } catch (balanceError) {
+      return NextResponse.json({
+        treasuryAddress: treasuryAccount.address().hex(),
+        balance: 0,
+        balanceOctas: '0',
+        status: 'initializing',
+        note: 'Treasury wallet is being initialized. Please wait a few minutes.'
+      });
+    }
+    
   } catch (error) {
     console.error('Treasury balance check error:', error);
     return NextResponse.json(
-      { error: 'Failed to check treasury balance: ' + (error.message || String(error)) },
+      { error: 'Failed to check treasury balance: ' + error.message },
       { status: 500 }
     );
   }

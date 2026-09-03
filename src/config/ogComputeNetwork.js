@@ -5,18 +5,18 @@
 
 // 0G Network RPC URLs
 export const OG_COMPUTE_NETWORK_CONFIG = {
-  // Mainnet configuration
-  mainnet: {
-    rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc.0g.ai',
-    networkName: '0G Mainnet',
-    chainId: 16661,
-  },
-  
-  // Galileo testnet
+  // Testnet configuration
   testnet: {
-    rpcUrl: process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai',
+    rpcUrl: process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc-testnet.0g.ai',
     networkName: '0G Testnet',
     chainId: 16602,
+  },
+  
+  // Mainnet configuration
+  mainnet: {
+    rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC_URL || 'https://evmrpc.0g.ai',
+    networkName: '0G Mainnet',
+    chainId: 16661,
   },
 };
 
@@ -73,43 +73,15 @@ export const OG_COMPUTE_SERVICE_CONFIG = {
   enableVerification: true,
 };
 
-// Canonical 0G EVM chain IDs
-export const OG_CHAIN_ID_MAINNET = 16661;          // 0x4115
-export const OG_CHAIN_ID_GALILEO_TESTNET = 16602;  // 0x40da
-
-function parseEnvChainId() {
-  // Prefer explicit mainnet chain ID; fall back to whichever chain var is set
-  const raw = (
-    process.env.NEXT_PUBLIC_0G_MAINNET_CHAIN_ID ||
-    process.env.NEXT_PUBLIC_CHAIN_ID ||
-    process.env.NEXT_PUBLIC_0G_GALILEO_CHAIN_ID ||
-    ''
-  ).trim();
-  if (!raw) return null;
-  if (/^0x[0-9a-f]+$/i.test(raw)) return parseInt(raw, 16);
-  const n = parseInt(raw, 10);
-  return Number.isFinite(n) ? n : null;
-}
-
 // Get current network config (testnet or mainnet)
 export const getCurrentNetworkConfig = () => {
-  const chainId = parseEnvChainId();
-  const network =
-    process.env.NEXT_PUBLIC_NETWORK ||
-    process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
-    '';
-
-  const isMainnetByChain = chainId === OG_CHAIN_ID_MAINNET;
-  const isMainnetByName =
-    network === '0g-mainnet' ||
-    network === 'mainnet' ||
-    network === 'og-0g-mainnet' ||
-    network === 'og-mainnet';
-
-  const isMainnet = isMainnetByChain || isMainnetByName;
-
-  console.log('🔧 getCurrentNetworkConfig:', { network, chainId, isMainnet });
-
+  const computeNetwork = process.env.NEXT_PUBLIC_0G_COMPUTE_NETWORK;
+  if (computeNetwork === 'testnet') return OG_COMPUTE_NETWORK_CONFIG.testnet;
+  if (computeNetwork === 'mainnet') return OG_COMPUTE_NETWORK_CONFIG.mainnet;
+  const isMainnet =
+    process.env.NEXT_PUBLIC_NETWORK === 'MAINNET' ||
+    process.env.NEXT_PUBLIC_NETWORK === '0g-mainnet' ||
+    process.env.NEXT_PUBLIC_0G_CHAIN === 'mainnet';
   return isMainnet
     ? OG_COMPUTE_NETWORK_CONFIG.mainnet
     : OG_COMPUTE_NETWORK_CONFIG.testnet;

@@ -2,8 +2,7 @@
 
 Complete integration guide for 0G Storage in the casino application.
 
-**Env template:** [`.env.example`](./.env.example) · **App networks:** 0G Mainnet (`16661`) and Galileo Testnet (`16602`)  
-**Live app:** https://apt-casino-0g-gamma.vercel.app/ · **Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Wave 3:** App is on **0G Mainnet**. Storage indexer: `https://indexer-storage-turbo.0g.ai`. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
 
 ## Overview
 
@@ -37,19 +36,16 @@ npm install @0glabs/0g-ts-sdk --legacy-peer-deps
 
 ### 2. Environment Variables
 
-Copy [`.env.example`](./.env.example) to `.env` and add:
+Add to `.env.local`:
 
 ```bash
-# 0G Storage indexer
-# Mainnet: https://indexer-storage-turbo.0g.ai
-# Galileo: https://indexer-storage-testnet-turbo.0g.ai
+# 0G Storage Indexer RPC
 NEXT_PUBLIC_0G_STORAGE_INDEXER_RPC=https://indexer-storage-turbo.0g.ai
 
-# 0G chain RPC (for upload transactions)
-NEXT_PUBLIC_0G_MAINNET_RPC=https://evmrpc.0g.ai
-NEXT_PUBLIC_0G_GALILEO_RPC=https://evmrpc-testnet.0g.ai
+# 0G Network RPC (for transactions)
+NEXT_PUBLIC_0G_RPC_URL=https://evmrpc.0g.ai
 
-# Treasury (must match TREASURY_ADDRESS)
+# Treasury Private Key (for uploads)
 TREASURY_PRIVATE_KEY=your_private_key_here
 
 # Flow Contract (for KV storage)
@@ -223,7 +219,7 @@ Predefined stream IDs for KV storage:
 import { getCurrentStorageNetworkConfig } from '@/config/ogStorage';
 
 const config = getCurrentStorageNetworkConfig();
-// Uses NEXT_PUBLIC_0G_GALILEO_RPC or NEXT_PUBLIC_0G_MAINNET_RPC from .env
+// Returns testnet or mainnet config based on NEXT_PUBLIC_NETWORK
 ```
 
 ### Storage Settings
@@ -334,7 +330,7 @@ Retrieve key-value data.
 
 **Problem**: `Treasury private key not configured`
 
-**Solution**: Set `TREASURY_PRIVATE_KEY` in `.env` (see `.env.example`)
+**Solution**: Set `TREASURY_PRIVATE_KEY` in `.env.local`
 
 ### Download Fails
 
@@ -373,9 +369,6 @@ Retrieve key-value data.
 
 ## Resources
 
-- [Live App (Vercel)](https://apt-casino-0g-gamma.vercel.app/)
-- [Demo Video](https://youtu.be/V5e2zKgOQPo)
-- [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G Storage SDK Documentation](0g-doc-main/docs/developer-hub/building-on-0g/storage/sdk.md)
 - [0G Storage Concepts](0g-doc-main/docs/concepts/storage.md)
 - [TypeScript SDK Repository](https://github.com/0gfoundation/0g-ts-sdk)
@@ -391,7 +384,7 @@ Retrieve key-value data.
 
 ---
 
-**Last Updated**: May 2026  
-**Version**: 1.1.0  
+**Last Updated**: November 2024  
+**Version**: 1.0.0  
 **Status**: Production Ready
 

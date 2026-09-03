@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { getTreasuryPrivateKeyOrNull, requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '@/config/treasury.js';
+import { getOgChainConfig } from '@/config/ogNetwork.js';
 
 export async function POST(request) {
   try {
     // Validate server-side config
-    if (!getTreasuryPrivateKeyOrNull()) {
+    if (!getTreasuryPrivateKey() || getTreasuryPrivateKey().length < 10) {
       return NextResponse.json({ success: false, error: 'Treasury private key missing on server' }, { status: 503 });
     }
     const gameData = await request.json();
@@ -24,29 +25,17 @@ export async function POST(request) {
       );
     }
 
-    // Resolve correct 0G network based on chainId sent from client
-    const MAINNET_CHAIN_ID = 16661;   // 0x4115
-    const TESTNET_CHAIN_ID = 16602;   // 0x40da
-
-    const incomingChainId = gameData.chainId ? parseInt(String(gameData.chainId), 10) : null;
-    const isTestnet = incomingChainId === TESTNET_CHAIN_ID;
-
-    const ogRpcUrl = isTestnet
-      ? (process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai')
-      : (process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai');
-
-    const ogExplorerUrl = isTestnet
-      ? (process.env.NEXT_PUBLIC_0G_GALILEO_EXPLORER || 'https://chainscan-galileo.0g.ai')
-      : (process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER || 'https://chainscan.0g.ai');
-
-    const networkLabel = isTestnet ? '0g-galileo-testnet' : '0g-mainnet';
+    // 0G Network configuration
+    const chain = getOgChainConfig();
+    const ogRpcUrl = chain.rpcUrl;
+    const ogExplorerUrl = chain.explorerUrl;
     
     // Create provider and wallet for 0G Network
     console.log('🔧 0G LOGGER API: Connecting to 0G Network...');
     console.log('🔧 RPC URL:', ogRpcUrl);
     
     const provider = new ethers.JsonRpcProvider(ogRpcUrl);
-    const treasuryWallet = new ethers.Wallet(requireTreasuryPrivateKey(), provider);
+    const treasuryWallet = new ethers.Wallet(getTreasuryPrivateKey(), provider);
     
     console.log('🏦 0G LOGGER API: Treasury wallet:', treasuryWallet.address);
     
@@ -64,7 +53,7 @@ export async function POST(request) {
         error: `Failed to connect to 0G Network: ${networkError.message}`,
         transactionHash: null,
         explorerUrl: null,
-        network: '0g-galileo-testnet'
+        network: getOgChainConfig().network
       });
     }
 
@@ -81,7 +70,7 @@ export async function POST(request) {
           error: 'Treasury wallet has no balance on 0G Network',
           transactionHash: null,
           explorerUrl: null,
-          network: '0g-galileo-testnet'
+          network: getOgChainConfig().network
         });
       }
     } catch (balanceError) {
@@ -91,7 +80,7 @@ export async function POST(request) {
         error: 'Failed to check treasury balance on 0G Network',
         transactionHash: null,
         explorerUrl: null,
-        network: '0g-galileo-testnet'
+        network: getOgChainConfig().network
       });
     }
 
@@ -176,7 +165,7 @@ export async function POST(request) {
         error: `Transaction failed: ${txError.message}`,
         transactionHash: null,
         explorerUrl: null,
-        network: '0g-galileo-testnet'
+        network: getOgChainConfig().network
       });
     }
 
@@ -193,7 +182,7 @@ export async function POST(request) {
       blockNumber: receipt.blockNumber,
       explorerUrl: `${ogExplorerUrl}/tx/${tx.hash}`,
       logData: logData,
-      network: networkLabel,
+      network: getOgChainConfig().network,
       gasUsed: receipt.gasUsed.toString()
     });
 
@@ -205,7 +194,7 @@ export async function POST(request) {
       error: error.message,
       transactionHash: null,
       explorerUrl: null,
-      network: '0g-mainnet'
+      network: getOgChainConfig().network
     }, { status: 500 });
   }
 }
@@ -213,12 +202,13 @@ export async function POST(request) {
 // GET endpoint to check 0G Network status
 export async function GET() {
   try {
-    if (!getTreasuryPrivateKeyOrNull()) {
+    if (!getTreasuryPrivateKey() || getTreasuryPrivateKey().length < 10) {
       return NextResponse.json({ success: false, error: 'Treasury private key missing on server', status: 'error' }, { status: 503 });
     }
-    const ogRpcUrl = process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc.0g.ai';
+    const chain = getOgChainConfig();
+    const ogRpcUrl = chain.rpcUrl;
     const provider = new ethers.JsonRpcProvider(ogRpcUrl);
-    const treasuryWallet = new ethers.Wallet(requireTreasuryPrivateKey(), provider);
+    const treasuryWallet = new ethers.Wallet(getTreasuryPrivateKey(), provider);
     
     // Check balance
     const balance = await provider.getBalance(treasuryWallet.address);
@@ -235,9 +225,10 @@ export async function GET() {
         balanceWei: balance.toString()
       },
       network: {
-        name: '0G Galileo Testnet',
+        name: chain.name,
         chainId: Number(network.chainId),
-        rpcUrl: ogRpcUrl
+        rpcUrl: ogRpcUrl,
+        explorerUrl: chain.explorerUrl
       },
       status: 'ready'
     });

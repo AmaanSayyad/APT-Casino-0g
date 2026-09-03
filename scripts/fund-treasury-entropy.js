@@ -1,22 +1,19 @@
 require('dotenv').config();
 const { ethers } = require('ethers');
 
-// Treasury configuration — uses the chain where Pyth Entropy settles (NEXT_PUBLIC_ORACLE_RPC_URL), not 0G.
+// Treasury configuration
 const TREASURY_PRIVATE_KEY = process.env.TREASURY_PRIVATE_KEY;
-const ORACLE_RPC =
-  process.env.NEXT_PUBLIC_ORACLE_RPC_URL ||
-  'https://sepolia-rollup.arbitrum.io/rpc';
+if (!TREASURY_PRIVATE_KEY) {
+  throw new Error('TREASURY_PRIVATE_KEY is required');
+}
+const ARBITRUM_SEPOLIA_RPC = process.env.NEXT_PUBLIC_ARBITRUM_SEPOLIA_RPC || 'https://sepolia-rollup.arbitrum.io/rpc';
 
 async function fundTreasuryForEntropy() {
   try {
-    if (!TREASURY_PRIVATE_KEY) {
-      console.error('❌ Set TREASURY_PRIVATE_KEY in .env');
-      process.exit(1);
-    }
     console.log('🏦 Funding Treasury for Pyth Entropy...');
     
     // Create provider and treasury wallet
-    const provider = new ethers.JsonRpcProvider(ORACLE_RPC);
+    const provider = new ethers.JsonRpcProvider(ARBITRUM_SEPOLIA_RPC);
     const treasuryWallet = new ethers.Wallet(TREASURY_PRIVATE_KEY, provider);
     
     console.log(`📍 Treasury Address: ${treasuryWallet.address}`);

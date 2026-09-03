@@ -4,7 +4,8 @@
  */
 
 import { ethers } from 'ethers';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '../config/treasury.js';
+import { getOgChainConfig, getGameLoggerAddress } from '../config/ogNetwork.js';
 
 // GameLogger contract ABI (only the functions we need)
 const GAME_LOGGER_ABI = [
@@ -23,16 +24,17 @@ class OGContractLogger {
     this.contract = null;
     this.isInitialized = false;
     
-    // 0G Network configuration - MAINNET
+    // 0G Network configuration
+    const chain = getOgChainConfig();
     this.networkConfig = {
-      chainId: 16661,
-      name: '0G-Mainnet',
-      rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
-      explorerUrl: process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER || 'https://chainscan.0g.ai'
+      chainId: chain.chainId,
+      name: chain.name,
+      rpcUrl: chain.rpcUrl,
+      explorerUrl: chain.explorerUrl,
+      network: chain.network,
     };
     
-    // Contract address (mainnet will be set after deployment)
-    this.contractAddress = process.env.NEXT_PUBLIC_GAME_LOGGER_CONTRACT_MAINNET || null;
+    this.contractAddress = getGameLoggerAddress();
   }
 
   /**
@@ -52,10 +54,15 @@ class OGContractLogger {
       this.provider = new ethers.JsonRpcProvider(this.networkConfig.rpcUrl);
       
       // Create treasury wallet
-      const pk = requireTreasuryPrivateKey();
-      this.treasuryWallet = new ethers.Wallet(pk, this.provider);
-      console.log('🏦 0G CONTRACT LOGGER: Treasury wallet initialized');
-      console.log(`📍 Treasury address: ${this.treasuryWallet.address}`);
+      const privateKey = getTreasuryPrivateKey();
+      if (privateKey) {
+        this.treasuryWallet = new ethers.Wallet(privateKey, this.provider);
+        console.log('🏦 0G CONTRACT LOGGER: Treasury wallet initialized');
+        console.log(`📍 Treasury address: ${this.treasuryWallet.address}`);
+      } else {
+        throw new Error('Treasury private key not found');
+      }
+
       // Create contract instance
       this.contract = new ethers.Contract(
         this.contractAddress,
@@ -191,7 +198,7 @@ class OGContractLogger {
         explorerUrl: `${this.networkConfig.explorerUrl}/tx/${tx.hash}`,
         contractAddress: this.contractAddress,
         eventData: eventData,
-        network: '0g-mainnet'
+        network: this.networkConfig.network
       };
 
     } catch (error) {
@@ -205,7 +212,7 @@ class OGContractLogger {
         blockNumber: null,
         explorerUrl: null,
         contractAddress: this.contractAddress,
-        network: '0g-mainnet'
+        network: this.networkConfig.network
       };
     }
   }

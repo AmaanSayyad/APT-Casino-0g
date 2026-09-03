@@ -9,7 +9,7 @@ import { NotificationProvider } from '@/components/NotificationSystem';
 import WalletConnectionGuard from '@/components/WalletConnectionGuard';
 import { ThemeProvider } from 'next-themes';
 import { WagmiProvider, createConfig, http } from 'wagmi';
-import { ogMainnet, ogGalileoTestnet } from '@/config/chains';
+import { ogMainnet } from '@/config/chains';
 import { RainbowKitProvider, getDefaultConfig, connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { 
   metaMaskWallet,
@@ -108,19 +108,21 @@ export default function Providers({ children }) {
   console.log('🔧 Providers mounting...');
   console.log('🔧 Project ID: 226b43b703188d269fb70d02c107c34e');
 
-  // RainbowKit config — both 0G Mainnet and Galileo Testnet supported
+  // RainbowKit configuration for 0G Mainnet (Wave 3)
   let config;
-
+  
   try {
     config = getDefaultConfig({
       appName: 'APT Casino',
       projectId: '226b43b703188d269fb70d02c107c34e',
-      chains: [ogMainnet, ogGalileoTestnet],
+      chains: [ogMainnet],
       ssr: true,
     });
+    console.log('🔧 Config created with getDefaultConfig:', config);
   } catch (error) {
     console.error('❌ Error creating config with getDefaultConfig:', error);
-
+    
+    // Fallback to manual config
     const connectors = connectorsForWallets([
       {
         groupName: 'Popular',
@@ -140,13 +142,13 @@ export default function Providers({ children }) {
 
     config = createConfig({
       connectors,
-      chains: [ogMainnet, ogGalileoTestnet],
+      chains: [ogMainnet],
       transports: {
-        [ogMainnet.id]:        http(),
-        [ogGalileoTestnet.id]: http(),
+        [ogMainnet.id]: http(process.env.NEXT_PUBLIC_0G_MAINNET_RPC_URL || 'https://evmrpc.0g.ai'),
       },
       ssr: true,
     });
+    console.log('🔧 Config created with manual setup:', config);
   }
 
   return (

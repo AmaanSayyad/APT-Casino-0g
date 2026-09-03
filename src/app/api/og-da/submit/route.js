@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '@/config/treasury.js';
 import { 
   getCurrentDANetworkConfig,
   OG_DA_BLOB_CONFIG,
@@ -44,7 +44,7 @@ export async function POST(request) {
     
     // Initialize provider and wallet for balance check
     const provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
-    const wallet = new ethers.Wallet(requireTreasuryPrivateKey(), provider);
+    const wallet = new ethers.Wallet(getTreasuryPrivateKey(), provider);
 
     // Check balance
     const balance = await provider.getBalance(wallet.address);

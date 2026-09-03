@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import OG_DA_CONFIG from '@/config/ogDA.js';
+import { getCurrentDANetworkConfig } from '@/config/ogDA.js';
 import ogDAClient from '@/services/OGDAClient.js';
 
 /**

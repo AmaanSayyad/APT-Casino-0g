@@ -4,7 +4,8 @@
  */
 
 import { ethers } from 'ethers';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '../config/treasury.js';
+import { getOgChainConfig } from '../config/ogNetwork.js';
 
 class OGNetworkLogger {
   constructor() {
@@ -12,12 +13,14 @@ class OGNetworkLogger {
     this.treasuryWallet = null;
     this.isInitialized = false;
     
-    // 0G Network configuration - MAINNET
+    // 0G Network configuration
+    const chain = getOgChainConfig();
     this.networkConfig = {
-      chainId: 16661,
-      name: '0G-Mainnet',
-      rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
-      explorerUrl: process.env.NEXT_PUBLIC_0G_MAINNET_EXPLORER || 'https://chainscan.0g.ai'
+      chainId: chain.chainId,
+      name: chain.name,
+      rpcUrl: chain.rpcUrl,
+      explorerUrl: chain.explorerUrl,
+      network: chain.network,
     };
   }
 
@@ -34,10 +37,14 @@ class OGNetworkLogger {
       this.provider = new ethers.JsonRpcProvider(this.networkConfig.rpcUrl);
       
       // Create treasury wallet
-      const pk = requireTreasuryPrivateKey();
-      this.treasuryWallet = new ethers.Wallet(pk, this.provider);
-      console.log('🏦 0G LOGGER: Treasury wallet initialized');
-      console.log(`📍 Treasury address: ${this.treasuryWallet.address}`);
+      const privateKey = getTreasuryPrivateKey();
+      if (privateKey) {
+        this.treasuryWallet = new ethers.Wallet(privateKey, this.provider);
+        console.log('🏦 0G LOGGER: Treasury wallet initialized');
+        console.log(`📍 Treasury address: ${this.treasuryWallet.address}`);
+      } else {
+        throw new Error('Treasury private key not found');
+      }
 
       this.isInitialized = true;
       console.log('✅ 0G LOGGER: Service initialized successfully');
@@ -142,7 +149,7 @@ class OGNetworkLogger {
         blockNumber: receipt.blockNumber,
         explorerUrl: `${this.networkConfig.explorerUrl}/tx/${tx.hash}`,
         logData: logData,
-        network: '0g-mainnet'
+        network: this.networkConfig.network
       };
 
     } catch (error) {
@@ -156,7 +163,7 @@ class OGNetworkLogger {
         blockNumber: null,
         explorerUrl: null,
         logData: null,
-        network: '0g-mainnet'
+        network: this.networkConfig.network
       };
     }
   }

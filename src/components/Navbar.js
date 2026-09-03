@@ -1,13 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import Link from "next/link";
-import BrandWordmark from "./BrandWordmark";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAccount, useChainId, useWalletClient } from 'wagmi';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBalance, setLoading, loadBalanceFromStorage } from '@/store/balanceSlice';
-import ConnectWalletButton from "./ConnectWalletButton";
+import EthereumConnectWalletButton from "./EthereumConnectWalletButton";
 import WithdrawModal from "./WithdrawModal";
 import LiveChat from "./LiveChat";
 import AiModal from "./AiModal";
@@ -16,8 +17,6 @@ import { useGlobalWalletPersistence } from '../hooks/useGlobalWalletPersistence'
 
 import { useNotification } from './NotificationSystem';
 import { TREASURY_CONFIG } from '../config/treasury';
-import { sendTreasuryNativeDeposit } from '@/lib/treasuryWalletDeposit';
-import { useTreasuryAddress } from '../hooks/useTreasuryAddress';
 // Enhanced UserBalanceSystem with deposit functionality
 const UserBalanceSystem = {
   getBalance: async (address) => {
@@ -64,18 +63,52 @@ const UserBalanceSystem = {
   }
 };
 
-const CASINO_MODULE_ADDRESS =
-  process.env.NEXT_PUBLIC_CASINO_MODULE_ADDRESS ||
-  process.env.NEXT_PUBLIC_CASINO_SESSION_CONTRACT ||
-  '';
+const parseAptAmount = (amount) => {
+  // Mock parsing for demo
+  return parseFloat(amount) / 100000000;
+};
+
+const ethereumClient = {
+  waitForTransaction: async ({ transactionHash }) => {
+    // Mock transaction wait for demo
+    return new Promise(resolve => setTimeout(resolve, 1000));
+  }
+};
+
+const CASINO_MODULE_ADDRESS = "0x1234567890123456789012345678901234567890123456789012345678901234";
+
+// Mock search results for demo purposes
+const MOCK_SEARCH_RESULTS = {
+  games: [
+    { id: 'game1', name: 'Roulette', path: '/game/roulette', type: 'Featured' },
+    { id: 'game2', name: 'Mines', path: '/game/mines', type: 'Popular' },
+    { id: 'game3', name: 'Spin Wheel', path: '/game/wheel', type: 'Featured' },
+    { id: 'game4', name: 'Plinko', path: '/game/plinko', type: 'Popular' },
+  ],
+  tournaments: [
+    { id: 'tournament1', name: 'High Roller Tournament', path: '/tournaments/high-roller', prize: '10,000 OG' },
+    { id: 'tournament2', name: 'Weekend Battle', path: '/tournaments/weekend-battle', prize: '5,000 OG' },
+  ],
+  pages: [
+    { id: 'page1', name: 'Bank', path: '/bank', description: 'Deposit and withdraw funds' },
+    { id: 'page2', name: 'Profile', path: '/profile', description: 'Your account details' },
+  ]
+};
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [userAddress, setUserAddress] = useState(null);
   const [isClient, setIsClient] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [showNotificationsPanel, setShowNotificationsPanel] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
+  const searchInputRef = useRef(null);
+  const searchPanelRef = useRef(null);
   const notification = useNotification();
   const isDev = process.env.NODE_ENV === 'development';
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -91,7 +124,6 @@ export default function Navbar() {
   const [isDepositing, setIsDepositing] = useState(false);
   const [showLiveChat, setShowLiveChat] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
-  const resolvedTreasuryAddress = useTreasuryAddress();
 
 
   // Wallet connection with persistence
@@ -246,10 +278,34 @@ export default function Navbar() {
   useEffect(() => {
     setIsClient(true);
     setUnreadNotifications(notifications.filter(n => !n.isRead).length);
-
+    
+    // Initialize dark mode from local storage if available
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode !== null) {
+      setIsDarkMode(savedMode === 'true');
+    }
+    
+    // Ethereum wallet integration - simplified for testnet only
+    // In development mode, use mock data
     if (isDev) {
       setUserAddress('0x1234...dev');
     }
+    
+    // Handle click outside search panel
+    const handleClickOutside = (event) => {
+      if (
+        searchPanelRef.current && 
+        !searchPanelRef.current.contains(event.target) &&
+        !searchInputRef.current?.contains(event.target)
+      ) {
+        setShowSearch(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isDev, notifications]);
 
   // Close balance modal with ESC
@@ -310,8 +366,7 @@ export default function Navbar() {
         },
         body: JSON.stringify({
           userAddress: address,
-          amount: balanceInOg,
-          chainId,
+          amount: balanceInOg
         })
       });
 
@@ -385,16 +440,96 @@ export default function Navbar() {
     console.log('🚀 Starting deposit process for:', amount, 'OG');
     try {
       console.log('Depositing to house balance:', { address: address, amount });
-
-      if (!walletClient) {
-        throw new Error('Wallet is not ready — try reconnecting with MetaMask');
+      
+      // Check if MetaMask is available
+      if (!window.ethereum) {
+        throw new Error('MetaMask is not installed');
       }
-
-      const txHash = await sendTreasuryNativeDeposit(walletClient, {
-        account: address,
-        amount,
+      
+      // Request account access if not already connected
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const userAccount = accounts[0];
+      
+      // Check if user is on 0G Galileo network
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const expectedChainId = TREASURY_CONFIG.NETWORK.CHAIN_ID;
+      
+      console.log('🔍 Current chain ID:', chainId);
+      console.log('🔍 Expected chain ID:', expectedChainId);
+      
+      if (chainId !== expectedChainId) {
+        console.log('🔄 Need to switch network...');
+        // Try to switch to 0G Galileo
+        try {
+          console.log('🔄 Attempting to switch to 0G Galileo...');
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: expectedChainId }],
+          });
+          console.log('✅ Successfully switched to 0G Galileo');
+        } catch (switchError) {
+          console.log('⚠️ Switch error:', switchError);
+          // If 0G Galileo is not added, add it
+          if (switchError.code === 4902) {
+            console.log('🔧 Network not found, adding 0G Galileo...');
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: expectedChainId,
+                  chainName: TREASURY_CONFIG.NETWORK.CHAIN_NAME,
+                  nativeCurrency: {
+                    name: 'OG',
+                    symbol: 'OG',
+                    decimals: 18
+                  },
+                  rpcUrls: [TREASURY_CONFIG.NETWORK.RPC_URL],
+                  blockExplorerUrls: [TREASURY_CONFIG.NETWORK.EXPLORER_URL]
+                }]
+              });
+              console.log('✅ Successfully added 0G Galileo network');
+              
+              // Try to switch again after adding
+              await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: expectedChainId }],
+              });
+              console.log('✅ Successfully switched to 0G Galileo after adding');
+            } catch (addError) {
+              console.error('❌ Failed to add network:', addError);
+              throw new Error(`Failed to add 0G Galileo network: ${addError.message}`);
+            }
+          } else {
+            console.error('❌ Switch error:', switchError);
+            throw new Error(`Please switch to ${TREASURY_CONFIG.NETWORK.CHAIN_NAME} network. Error: ${switchError.message}`);
+          }
+        }
+      } else {
+        console.log('✅ Already on correct network');
+      }
+      
+      // Casino treasury address from config
+      const TREASURY_ADDRESS = TREASURY_CONFIG.ADDRESS;
+      
+      // Convert amount to Wei (18 decimals)
+      const amountWei = (amount * 10**18).toString();
+      
+      // Send transaction to treasury
+      const transactionParameters = {
+        to: TREASURY_ADDRESS,
+        from: userAccount,
+        value: '0x' + parseInt(amountWei).toString(16), // Convert to hex
+        gas: TREASURY_CONFIG.GAS.DEPOSIT_LIMIT, // Gas limit from config
+      };
+      
+      console.log('Sending transaction to MetaMask:', transactionParameters);
+      
+      // Request transaction from MetaMask
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
       });
-
+      
       console.log('Transaction sent:', txHash);
       
       // Wait for transaction confirmation
@@ -442,6 +577,29 @@ export default function Navbar() {
     }
   };
 
+  // Handle search input
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      // In a real app, you would call an API here
+      // For demo, we'll filter the mock data
+      const query = searchQuery.toLowerCase();
+      const games = MOCK_SEARCH_RESULTS.games.filter(
+        game => game.name.toLowerCase().includes(query)
+      );
+      const tournaments = MOCK_SEARCH_RESULTS.tournaments.filter(
+        tournament => tournament.name.toLowerCase().includes(query)
+      );
+      const pages = MOCK_SEARCH_RESULTS.pages.filter(
+        page => page.name.toLowerCase().includes(query) || 
+               (page.description && page.description.toLowerCase().includes(query))
+      );
+      
+      setSearchResults({ games, tournaments, pages });
+    } else {
+      setSearchResults(null);
+    }
+  }, [searchQuery]);
+
   const navLinks = [
     {
       name: "Home",
@@ -465,6 +623,17 @@ export default function Navbar() {
     },
   ];
 
+  const handleProfileClick = () => {
+    router.push("/profile");
+  };
+  
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('darkMode', newMode.toString());
+    // Here you would also apply the theme change to your app
+  };
+  
   const markNotificationAsRead = (id) => {
     setNotifications(prev => 
       prev.map(n => n.id === id ? {...n, isRead: true} : n)
@@ -479,9 +648,25 @@ export default function Navbar() {
     notification.success("All notifications marked as read");
   };
   
+  const handleSearchIconClick = () => {
+    setShowSearch(prev => !prev);
+    if (!showSearch) {
+      // Focus the search input when opening
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  };
+  
+  const handleSearchItemClick = (path) => {
+    router.push(path);
+    setShowSearch(false);
+    setSearchQuery('');
+  };
+
   // Pyth Entropy handles randomness generation
 
-  // Detect injected wallet network (best-effort)
+  // Detect Ethereum wallet network (best-effort)
   useEffect(() => {
     const readNetwork = async () => {
       try {
@@ -504,20 +689,21 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed left-0 right-0 top-0 z-50 w-full max-w-[100vw] overflow-x-hidden bg-[#070005]/90 shadow-lg backdrop-blur-md transition-all duration-300">
-        <div className="mx-auto w-full min-w-0 max-w-[100vw] px-3 sm:px-4 md:px-6 lg:px-10 xl:px-14 2xl:px-20">
-          <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-2 py-3 sm:gap-x-3 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-4 md:py-4">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="min-w-0 shrink">
-              <BrandWordmark
-                className="py-0.5"
-                textClassName="text-sm sm:text-base md:text-lg lg:text-[1.125rem]"
+      <nav className="backdrop-blur-md bg-[#070005]/90 fixed w-full z-20 transition-all duration-300 shadow-lg">
+        <div className="flex w-full items-center justify-between py-6 px-4 sm:px-10 md:px-20 lg:px-36">
+          <div className="flex items-center">
+            <a href="/" className="logo mr-6">
+            <Image
+              src="/PowerPlay.png"
+              alt="powerplay image"
+              width={172}
+              height={15}
               />
-            </span>
+            </a>
             
             {/* Mobile menu button */}
             <button 
-              className="shrink-0 rounded-lg p-1 text-white transition-colors hover:bg-purple-500/20 md:hidden"
+              className="md:hidden text-white p-1 rounded-lg hover:bg-purple-500/20 transition-colors"
               onClick={() => setShowMobileMenu(!showMobileMenu)}
               aria-label="Toggle mobile menu"
             >
@@ -539,11 +725,11 @@ export default function Navbar() {
           </div>
           
           {/* Desktop Navigation Links */}
-          <div className="hidden min-w-0 items-center justify-center gap-4 font-display md:flex lg:gap-8 xl:gap-10">
+          <div className="hidden md:flex font-display gap-8 lg:gap-12 items-center">
             {navLinks.map(({ name, path, classes }, index) => (
-              <div key={index} className="relative shrink-0 group">
+              <div key={index} className="relative group">
               <Link
-                  className={`${path === pathname ? "text-transparent bg-clip-text bg-gradient-to-r from-red-magic to-blue-magic font-semibold" : classes} flex items-center gap-1 text-sm font-medium transition-all duration-200 hover:scale-105 lg:text-base xl:text-lg`}
+                  className={`${path === pathname ? "text-transparent bg-clip-text bg-gradient-to-r from-red-magic to-blue-magic font-semibold" : classes} flex items-center gap-1 text-lg font-medium transition-all duration-200 hover:scale-105`}
                 href={path}
               >
                 {name}
@@ -552,7 +738,177 @@ export default function Navbar() {
             ))}
           </div>
           
-          <div className="flex min-w-0 max-w-full items-center justify-end gap-1 sm:gap-1.5 md:gap-2 md:pl-2 lg:gap-2.5">
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Search Icon */}
+            <div className="relative">
+              <button 
+                className="p-2 text-white/70 hover:text-white transition-colors rounded-full hover:bg-purple-500/20"
+                onClick={handleSearchIconClick}
+                aria-label="Search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </button>
+              
+              {/* Search Panel */}
+              {showSearch && (
+                <div 
+                  className="absolute right-0 mt-2 w-80 md:w-96 bg-[#1A0015]/95 backdrop-blur-md border border-purple-500/30 rounded-lg shadow-xl z-40 animate-fadeIn"
+                  ref={searchPanelRef}
+                >
+                  <div className="p-3">
+                    <div className="relative">
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search games, tournaments..."
+                        className="w-full py-2 px-3 pr-10 bg-[#250020] border border-purple-500/20 rounded-md text-white focus:outline-none focus:border-purple-500"
+                      />
+                      <svg 
+                        className="absolute right-3 top-2.5 text-white/50" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2"
+                      >
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {searchQuery.length > 1 && (
+                    <div className="max-h-96 overflow-y-auto">
+                      {(!searchResults || 
+                        (searchResults.games.length === 0 && 
+                         searchResults.tournaments.length === 0 && 
+                         searchResults.pages.length === 0)) ? (
+                        <div className="p-4 text-center text-white/50">
+                          No results found
+                        </div>
+                      ) : (
+                        <>
+                          {/* Games */}
+                          {searchResults.games.length > 0 && (
+                            <div className="p-2">
+                              <h3 className="text-xs font-medium text-white/50 uppercase px-3 mb-1">Games</h3>
+                              {searchResults.games.map(game => (
+                                <div 
+                                  key={game.id}
+                                  className="p-2 hover:bg-purple-500/10 rounded-md cursor-pointer mx-1"
+                                  onClick={() => handleSearchItemClick(game.path)}
+                                >
+                                  <div className="flex items-center">
+                                    <div className="w-8 h-8 rounded-md bg-purple-800/30 flex items-center justify-center mr-3">
+                                      <span className="text-sm">{game.name.charAt(0)}</span>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium text-white">{game.name}</p>
+                                      <span className="text-xs text-white/50">{game.type}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* Tournaments */}
+                          {searchResults.tournaments.length > 0 && (
+                            <div className="p-2">
+                              <h3 className="text-xs font-medium text-white/50 uppercase px-3 mb-1">Tournaments</h3>
+                              {searchResults.tournaments.map(tournament => (
+                                <div 
+                                  key={tournament.id}
+                                  className="p-2 hover:bg-purple-500/10 rounded-md cursor-pointer mx-1"
+                                  onClick={() => handleSearchItemClick(tournament.path)}
+                                >
+                                  <div className="flex items-center">
+                                    <div className="w-8 h-8 rounded-md bg-red-800/30 flex items-center justify-center mr-3">
+                                      <span className="text-sm">🏆</span>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium text-white">{tournament.name}</p>
+                                      <span className="text-xs text-white/50">Prize: {tournament.prize}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* Pages */}
+                          {searchResults.pages.length > 0 && (
+                            <div className="p-2">
+                              <h3 className="text-xs font-medium text-white/50 uppercase px-3 mb-1">Pages</h3>
+                              {searchResults.pages.map(page => (
+                                <div 
+                                  key={page.id}
+                                  className="p-2 hover:bg-purple-500/10 rounded-md cursor-pointer mx-1"
+                                  onClick={() => handleSearchItemClick(page.path)}
+                                >
+                                  <div className="flex items-center">
+                                    <div className="w-8 h-8 rounded-md bg-blue-800/30 flex items-center justify-center mr-3">
+                                      <span className="text-sm">{page.name.charAt(0)}</span>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium text-white">{page.name}</p>
+                                      {page.description && (
+                                        <span className="text-xs text-white/50">{page.description}</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                  
+                  {searchQuery.length > 0 && (
+                    <div className="p-2 border-t border-purple-500/20 text-center">
+                      <span className="text-xs text-white/50">
+                        Press Enter to search for "{searchQuery}"
+                </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleDarkMode}
+              className="p-2 text-white/70 hover:text-white transition-colors hidden md:block rounded-full hover:bg-purple-500/20"
+              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDarkMode ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="4"></circle>
+                  <path d="M12 2v2"></path>
+                  <path d="M12 20v2"></path>
+                  <path d="M5 5l1.5 1.5"></path>
+                  <path d="M17.5 17.5l1.5 1.5"></path>
+                  <path d="M2 12h2"></path>
+                  <path d="M20 12h2"></path>
+                  <path d="M5 19l1.5-1.5"></path>
+                  <path d="M17.5 6.5l1.5-1.5"></path>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
+            </button>
+            
             {/* Notifications */}
             <div className="relative hidden md:block">
               <button 
@@ -620,176 +976,70 @@ export default function Navbar() {
             
 
             
+            {/* User Balance Display */}
             {isWalletReady && (
-              <div
-                className="ml-0 flex min-w-0 max-w-[min(100%,28rem)] flex-wrap items-center justify-end gap-1 rounded-xl border border-white/[0.08] bg-black/30 px-1 py-1 backdrop-blur-sm sm:max-w-none sm:gap-1.5 sm:px-1.5 sm:py-1.5 md:ml-1"
-                aria-label="Wallet actions"
-              >
-                <div className="flex min-w-0 max-w-full items-center gap-1 rounded-lg border border-[#9200E1]/35 bg-[#9200E1]/[0.08] px-1.5 py-1 sm:gap-1.5 sm:px-2 sm:py-1.5 md:px-2.5">
-                  <span className="hidden whitespace-nowrap text-[11px] text-white/55 md:inline">
-                    Balance
-                  </span>
-                  <span className="max-w-[5.5rem] truncate text-xs font-semibold tabular-nums text-[#E8C8FF] sm:max-w-[7rem] md:text-sm lg:max-w-[9rem]">
-                    {isLoadingBalance
-                      ? '…'
-                      : `${parseFloat(userBalance || '0').toFixed(5)}`}
-                  </span>
-                  <span className="shrink-0 text-[10px] text-white/45 sm:text-[11px]">
-                    0G
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowBalanceModal(true)}
-                    className="shrink-0 rounded-md border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-white/80 transition-colors hover:border-[#B75FFF]/50 hover:bg-[#9200E1]/20 hover:text-white"
-                  >
-                    Manage
-                  </button>
-                </div>
-
-                {isConnected && (
-                  <div
-                    className="hidden items-center gap-1 rounded-md border border-[#9200E1]/30 bg-[#0a0008]/80 px-2 py-1 text-[11px] font-medium text-[#D8B4FE] xl:flex"
-                    title="Secured with Pyth Entropy"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="shrink-0 opacity-90"
-                      aria-hidden
-                    >
-                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                    <span className="max-w-[7rem] truncate lg:max-w-none">
-                      Entropy
+              <div className="flex items-center space-x-3">
+                <div className="bg-gradient-to-r from-green-900/20 to-green-800/10 rounded-lg border border-green-800/30 px-3 py-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-300">Balance:</span>
+                    <span className="text-sm text-green-300 font-medium">
+                      {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} OG`}
                     </span>
+                    <button
+                      onClick={() => setShowBalanceModal(true)}
+                      className="ml-2 text-xs bg-green-600/30 hover:bg-green-500/30 text-green-300 px-2 py-1 rounded transition-colors"
+                    >
+                      Manage
+                    </button>
                   </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => setShowAiModal(true)}
-                  className="flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#B75FFF]/40 bg-[#9200E1]/25 px-2 text-xs font-medium text-white transition-colors hover:border-[#B75FFF]/60 hover:bg-[#9200E1]/40 sm:h-9 sm:px-2.5"
-                  title="AI Assistant"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="shrink-0"
-                    aria-hidden
-                  >
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
-                  <span className="hidden lg:inline">AI</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowLiveChat(true)}
-                  className="flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#9200E1]/35 bg-white/5 px-2 text-xs font-medium text-white/90 transition-colors hover:border-[#B75FFF]/45 hover:bg-[#9200E1]/15 sm:h-9 sm:px-2.5"
-                  title="Live chat"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="shrink-0 text-[#E9D5FF]"
-                    aria-hidden
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                  <span className="hidden lg:inline">Chat</span>
-                </button>
+                </div>
               </div>
-            )}
-
-            {isConnected && !isWalletReady && (
-              <div
-                className="hidden items-center gap-1 rounded-md border border-[#9200E1]/30 bg-[#9200E1]/10 px-2 py-1 text-[11px] font-medium text-[#D8B4FE] xl:flex"
-                title="Secured with Pyth Entropy"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-                Entropy
-              </div>
-            )}
-
-            {!isWalletReady && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setShowAiModal(true)}
-                  className="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-[#B75FFF]/40 bg-[#9200E1]/25 px-3 text-sm font-medium text-white transition-colors hover:border-[#B75FFF]/60 hover:bg-[#9200E1]/40"
-                  title="AI Assistant"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden
-                  >
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
-                  <span className="hidden sm:inline">AI</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowLiveChat(true)}
-                  className="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-[#9200E1]/35 bg-white/5 px-3 text-sm font-medium text-white/90 transition-colors hover:border-[#B75FFF]/45 hover:bg-[#9200E1]/15"
-                  title="Live chat"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="text-[#E9D5FF]"
-                    aria-hidden
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                  <span className="hidden sm:inline">Chat</span>
-                </button>
-              </>
             )}
             
-            <div className="min-w-0 shrink">
-              <ConnectWalletButton />
-            </div>
+            {/* Pyth Entropy Status */}
+            {isConnected && (
+              <div className="px-3 py-2 bg-gradient-to-r from-blue-500/20 to-purple-600/20 border border-blue-500/30 text-blue-300 font-medium rounded-lg flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Pyth Entropy
+              </div>
+            )}
+            
+            {/* 0G Mainnet Wave 3 proof */}
+            <a
+              href="/0g"
+              className="px-3 py-2 bg-gradient-to-r from-emerald-500/20 to-cyan-600/20 border border-emerald-500/30 text-emerald-300 font-medium rounded-lg"
+            >
+              0G Mainnet
+            </a>
+
+            {/* AI Assistant Button */}
+            <button
+              onClick={() => setShowAiModal(true)}
+              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              AI Assistant
+            </button>
+            
+            {/* Live Chat Button */}
+            <button
+              onClick={() => setShowLiveChat(true)}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              Live Chat
+            </button>
+            
+            {/* Ethereum Wallet Button */}
+            <EthereumConnectWalletButton />
       
           </div>
-        </div>
         </div>
         
         {/* Mobile Navigation Menu */}
@@ -807,28 +1057,51 @@ export default function Navbar() {
                   </Link>
                 </div>
               ))}
+              {/* Switch to Testnet button removed */}
+              <div className="flex justify-between items-center py-2 px-3">
+                <span className="text-white/70">Dark Mode</span>
+                <button 
+                  onClick={toggleDarkMode}
+                  className="p-2 text-white/70 hover:text-white bg-purple-500/10 rounded-full flex items-center justify-center h-8 w-8"
+                >
+                  {isDarkMode ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="4"></circle>
+                      <path d="M12 2v2"></path>
+                      <path d="M12 20v2"></path>
+                      <path d="M5 5l1.5 1.5"></path>
+                      <path d="M17.5 17.5l1.5 1.5"></path>
+                      <path d="M2 12h2"></path>
+                      <path d="M20 12h2"></path>
+                      <path d="M5 19l1.5-1.5"></path>
+                      <path d="M17.5 6.5l1.5-1.5"></path>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                  )}
+                </button>
+              </div>
               
               {/* User Balance in Mobile Menu */}
               {isWalletReady && (
                 <div className="pt-2 mt-2 border-t border-purple-500/10">
-                  <div className="rounded-lg border border-[#9200E1]/35 bg-[#9200E1]/[0.08] p-3">
-                    <div className="mb-2 flex items-center justify-between gap-2">
-                      <span className="text-sm text-white/55">House balance</span>
-                      <span className="text-sm font-semibold tabular-nums text-[#E8C8FF]">
-                        {isLoadingBalance
-                          ? '…'
-                          : `${parseFloat(userBalance || '0').toFixed(5)} 0G`}
-                      </span>
+                  <div className="p-3 bg-gradient-to-r from-green-900/20 to-green-800/10 rounded-lg border border-green-800/30">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-300">House Balance:</span>
+                                      <span className="text-sm text-green-300 font-medium">
+                      {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} OG`}
+                    </span>
                     </div>
                     <button
-                      type="button"
                       onClick={() => {
                         setShowBalanceModal(true);
                         setShowMobileMenu(false);
                       }}
-                      className="w-full rounded-md border border-white/15 bg-white/5 px-3 py-2 text-xs font-medium text-white/85 transition-colors hover:border-[#B75FFF]/45 hover:bg-[#9200E1]/20"
+                      className="w-full text-xs bg-green-600/30 hover:bg-green-500/30 text-green-300 px-3 py-2 rounded transition-colors"
                     >
-                      Manage balance
+                      Manage Balance
                     </button>
                   </div>
                 </div>
@@ -872,10 +1145,10 @@ export default function Navbar() {
               </div>
               
               {/* Current Balance */}
-              <div className="mb-4 rounded-lg border border-[#9200E1]/35 bg-[#9200E1]/[0.08] p-3">
-                <span className="text-sm text-white/55">Current balance</span>
-                <div className="text-lg font-bold tabular-nums text-[#E8C8FF]">
-                  {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} 0G`}
+              <div className="mb-4 p-3 bg-gradient-to-r from-green-900/20 to-green-800/10 rounded-lg border border-green-800/30">
+                <span className="text-sm text-gray-300">Current Balance:</span>
+                <div className="text-lg text-green-300 font-bold">
+                  {isLoadingBalance ? 'Loading...' : `${parseFloat(userBalance || '0').toFixed(5)} OG`}
                 </div>
               </div>
               
@@ -883,10 +1156,7 @@ export default function Navbar() {
               <div className="mb-6">
                 <h4 className="text-sm font-medium text-white mb-2">Deposit OG to Casino Treasury</h4>
                 <div className="text-xs text-gray-400 mb-2">
-                  Treasury:{' '}
-                  {resolvedTreasuryAddress
-                    ? `${resolvedTreasuryAddress.slice(0, 10)}...${resolvedTreasuryAddress.slice(-8)}`
-                    : <span className="text-yellow-400">Loading…</span>}
+                  Treasury: {TREASURY_CONFIG.ADDRESS.slice(0, 10)}...{TREASURY_CONFIG.ADDRESS.slice(-8)}
                 </div>
                 <div className="flex gap-2">
                   <input

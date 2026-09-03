@@ -7,76 +7,39 @@ import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { createZGComputeNetworkBroker } from '@0glabs/0g-serving-broker';
 import OpenAI from 'openai';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '@/config/treasury.js';
 import { 
   getCurrentNetworkConfig,
   DEFAULT_PROVIDER,
   OG_COMPUTE_PROVIDERS 
-} from '../../../config/ogComputeNetwork.js';
+} from '@/config/ogComputeNetwork.js';
 
-// Broker singleton — reset on failure so stale testnet instance doesn't persist
+// Initialize broker (singleton pattern)
 let broker = null;
 let isBrokerInitialized = false;
-let lastNetworkRpc = null;
-
-function isMissingLedgerError(error) {
-  const msg = error?.message || '';
-  return (
-    error?.code === 'BAD_DATA' ||
-    error?.value === '0x' ||
-    msg.includes('could not decode result data') ||
-    msg.includes('not exist') ||
-    msg.includes('not found')
-  );
-}
-
-/** Returns ledger balance, or zero if no compute account exists on this network yet. */
-async function getLedgerBalanceSafe(brokerInstance) {
-  try {
-    const account = await brokerInstance.ledger.getLedger();
-    return {
-      balance: ethers.formatEther(account.totalBalance),
-      raw: { totalBalance: account.totalBalance.toString() },
-      ledgerExists: true,
-    };
-  } catch (error) {
-    if (isMissingLedgerError(error)) {
-      return {
-        balance: '0',
-        raw: { totalBalance: '0' },
-        ledgerExists: false,
-        message:
-          'No AI compute ledger on this network yet. Fund the treasury wallet with OG, then use Top Up AI.',
-      };
-    }
-    throw error;
-  }
-}
 
 async function getBroker() {
-  const networkConfig = getCurrentNetworkConfig();
-
-  // Re-init if network changed or not yet initialized
-  if (isBrokerInitialized && broker && lastNetworkRpc === networkConfig.rpcUrl) {
+  if (isBrokerInitialized && broker) {
     return broker;
   }
 
-  // Reset stale instance
-  broker = null;
-  isBrokerInitialized = false;
-
   try {
+    const networkConfig = getCurrentNetworkConfig();
     const provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
-    const privateKey = requireTreasuryPrivateKey();
+    
+    // Use treasury wallet for server-side operations
+    const privateKey = getTreasuryPrivateKey();
+    if (!privateKey) {
+      throw new Error('TREASURY_PRIVATE_KEY not configured');
+    }
+
     const wallet = new ethers.Wallet(privateKey, provider);
     broker = await createZGComputeNetworkBroker(wallet);
     isBrokerInitialized = true;
-    lastNetworkRpc = networkConfig.rpcUrl;
-    console.log(`✅ 0G Compute broker initialized — ${networkConfig.networkName} (${networkConfig.rpcUrl})`);
+    
+    console.log('✅ 0G Compute broker initialized on server');
     return broker;
   } catch (error) {
-    broker = null;
-    isBrokerInitialized = false;
     console.error('❌ Failed to initialize 0G Compute broker:', error);
     throw error;
   }
@@ -91,34 +54,18 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
 
-    // walletBalance doesn't need the broker
-    if (action === 'walletBalance') {
-      const networkConfig = getCurrentNetworkConfig();
-      const provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
-      const privateKey = requireTreasuryPrivateKey();
-      const wallet = new ethers.Wallet(privateKey, provider);
-      const raw = await provider.getBalance(wallet.address);
-      return NextResponse.json({
-        success: true,
-        address: wallet.address,
-        balance: ethers.formatEther(raw),
-        network: networkConfig.networkName,
-      });
-    }
-
     const brokerInstance = await getBroker();
 
     switch (action) {
-      case 'balance': {
-        const ledger = await getLedgerBalanceSafe(brokerInstance);
+      case 'balance':
+        const account = await brokerInstance.ledger.getLedger();
         return NextResponse.json({
           success: true,
-          balance: ledger.balance,
-          ledgerExists: ledger.ledgerExists,
-          message: ledger.message,
-          raw: ledger.raw,
+          balance: ethers.formatEther(account.totalBalance),
+          raw: {
+            totalBalance: account.totalBalance.toString(),
+          },
         });
-      }
 
       case 'services':
         const services = await brokerInstance.inference.listService();
@@ -179,22 +126,24 @@ export async function POST(request) {
         }
 
         // Check balance before proceeding
-        {
-          const ledger = await getLedgerBalanceSafe(brokerInstance);
-          const balance = parseFloat(ledger.balance);
+        try {
+          const account = await brokerInstance.ledger.getLedger();
+          const balance = parseFloat(ethers.formatEther(account.totalBalance));
+          
+          // Minimum required balance for inference (0.5 OG to be safe)
           const MIN_BALANCE = 0.5;
-
-          if (!ledger.ledgerExists || balance < MIN_BALANCE) {
+          
+          if (balance < MIN_BALANCE) {
             return NextResponse.json({
               success: false,
-              error: ledger.ledgerExists
-                ? `Insufficient balance. Current balance: ${balance.toFixed(4)} OG. Minimum required: ${MIN_BALANCE} OG. Top up the AI ledger on the Bank page.`
-                : `No AI compute ledger on this network. Top up at least ${MIN_BALANCE} OG on the Bank → AI Compute tab.`,
+              error: `Insufficient balance. Current balance: ${balance.toFixed(4)} OG. Minimum required: ${MIN_BALANCE} OG. Please add funds first.`,
               currentBalance: balance,
               requiredBalance: MIN_BALANCE,
-              ledgerExists: ledger.ledgerExists,
             }, { status: 400 });
           }
+        } catch (balanceError) {
+          console.warn('⚠️ Could not check balance:', balanceError);
+          // Continue anyway, let the provider handle it
         }
 
         // Get service metadata
@@ -271,26 +220,30 @@ export async function POST(request) {
         });
       }
 
-      case 'addFunds':
-      case 'createAccount': {
-        const amount = body.amount || 1;
-        // depositFund adds to an existing ledger; addLedger creates a new one.
-        // Account already exists, so always use depositFund.
-        try {
-          await brokerInstance.ledger.depositFund(amount);
-        } catch (depositErr) {
-          // If depositFund fails because the account doesn't exist yet, create it.
-          if (depositErr?.message?.includes('not exist') || depositErr?.message?.includes('not found')) {
-            await brokerInstance.ledger.addLedger(amount);
-          } else {
-            throw depositErr;
-          }
-        }
+      case 'addFunds': {
+        const amount = body.amount || 0.1;
+        
+        // addLedger creates account if it doesn't exist and adds funds
+        const tx = await brokerInstance.ledger.addLedger(amount);
 
         return NextResponse.json({
           success: true,
+          transaction: tx,
           amount,
-          message: `Successfully deposited ${amount} OG into AI compute ledger.`,
+          message: 'Funds added successfully. Account created if it did not exist.',
+        });
+      }
+      
+      case 'createAccount': {
+        // Explicitly create account with initial deposit
+        const amount = body.amount || 0.01;
+        const tx = await brokerInstance.ledger.addLedger(amount);
+
+        return NextResponse.json({
+          success: true,
+          transaction: tx,
+          amount,
+          message: 'Account created successfully.',
         });
       }
 

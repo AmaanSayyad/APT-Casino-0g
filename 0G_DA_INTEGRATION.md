@@ -2,9 +2,9 @@
 
 This documentation explains how 0G DA is integrated into the casino application.
 
-**For detailed setup guide, see:** [0G_DA_SETUP_GUIDE.md](./0G_DA_SETUP_GUIDE.md)  
-**Env template:** [`.env.example`](./.env.example)  
-**Live app:** https://apt-casino-0g-gamma.vercel.app/ · **Demo video:** https://youtu.be/V5e2zKgOQPo · **0G Storage, Compute & DA integration video:** https://youtu.be/DMvrNK7nMBo
+**Wave 3:** 0G Chain is on mainnet. DA may remain on a testnet/local client. Demo: https://youtu.be/1QGwBnbokOw · Live: https://apt-casino-0g-gamma.vercel.app
+
+**For detailed setup guide, see:** [0G_DA_SETUP_GUIDE.md](./0G_DA_SETUP_GUIDE.md)
 
 ## Overview
 
@@ -47,18 +47,14 @@ scripts\setup-og-da-client.bat
 
 ### 2. Environment Variables
 
-Copy [`.env.example`](./.env.example) to `.env` and add:
+Add to `.env` file:
 
 ```bash
 # 0G DA Client URL (gRPC endpoint)
 NEXT_PUBLIC_0G_DA_CLIENT_URL=http://localhost:51001
 
-# 0G chain RPC (DA uses the same chain as treasury — pick mainnet or Galileo)
-NEXT_PUBLIC_0G_MAINNET_RPC=https://evmrpc.0g.ai
-NEXT_PUBLIC_0G_GALILEO_RPC=https://evmrpc-testnet.0g.ai
-
-# Treasury (must match TREASURY_ADDRESS)
-TREASURY_PRIVATE_KEY=your_private_key_here
+# 0G Network RPC (for DA contract interactions)
+NEXT_PUBLIC_0G_RPC_URL=https://evmrpc-testnet.0g.ai
 ```
 
 ### 3. Running DA Client Node
@@ -254,9 +250,6 @@ const result = await ogDAClient.disperseBlob(blobData);
 
 ## Resources
 
-- [Live App (Vercel)](https://apt-casino-0g-gamma.vercel.app/)
-- [Demo Video](https://youtu.be/V5e2zKgOQPo)
-- [0G Storage, Compute & DA Integration Video](https://youtu.be/DMvrNK7nMBo)
 - [0G DA Integration Guide](0g-doc-main/docs/developer-hub/building-on-0g/da-integration.md)
 - [0G DA Technical Deep Dive](0g-doc-main/docs/developer-hub/building-on-0g/da-deep-dive.md)
 - [DA Client Repository](https://github.com/0gfoundation/0g-da-client)

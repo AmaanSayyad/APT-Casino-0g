@@ -12,7 +12,7 @@ import {
   OG_DA_GAME_HISTORY_CONFIG,
   validateBlobSize 
 } from '../config/ogDA.js';
-import { getTreasuryPrivateKeyOrNull } from '@/lib/treasuryPrivate.js';
+import { getTreasuryPrivateKey } from '../config/treasury.js';
 import { ethers } from 'ethers';
 import ogDAClient from './OGDAClient.js';
 
@@ -37,9 +37,8 @@ class OGDAService {
       this.provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
       
       // Initialize wallet (for contract interactions)
-      const pk = getTreasuryPrivateKeyOrNull();
-      if (pk) {
-        this.wallet = new ethers.Wallet(pk, this.provider);
+      if (getTreasuryPrivateKey()) {
+        this.wallet = new ethers.Wallet(getTreasuryPrivateKey(), this.provider);
       }
       
       // DA Client URL (gRPC endpoint)

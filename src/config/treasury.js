@@ -1,41 +1,20 @@
-// Public treasury / chain settings only (safe for client bundles). Secrets: use @/lib/treasuryPrivate on the server.
+import { getOgChainConfig } from './ogNetwork';
 
-function reqEnv(name, publicFallbackNames = []) {
-  const v = process.env[name] || publicFallbackNames.map((n) => process.env[n]).find(Boolean);
-  return (v && String(v).trim()) || '';
-}
-
-// Both 0G networks — users may be on either one
-export const OG_MAINNET = {
-  CHAIN_ID: 16661,
-  CHAIN_ID_HEX: '0x4115',
-  CHAIN_NAME: '0G Mainnet',
-  RPC_URL: 'https://evmrpc.0g.ai',
-  EXPLORER_URL: 'https://chainscan.0g.ai',
-};
-
-export const OG_GALILEO_TESTNET = {
-  CHAIN_ID: 16602,
-  CHAIN_ID_HEX: '0x40da',
-  CHAIN_NAME: '0G-Galileo-Testnet',
-  RPC_URL: 'https://evmrpc-testnet.0g.ai',
-  EXPLORER_URL: 'https://chainscan-galileo.0g.ai',
-};
-
-export const OG_SUPPORTED_CHAIN_IDS = [OG_MAINNET.CHAIN_ID, OG_GALILEO_TESTNET.CHAIN_ID];
-
-/** Return the network config for a given numeric chain ID, or null if unsupported. */
-export function getOgNetworkByChainId(chainId) {
-  if (chainId === OG_MAINNET.CHAIN_ID) return OG_MAINNET;
-  if (chainId === OG_GALILEO_TESTNET.CHAIN_ID) return OG_GALILEO_TESTNET;
-  return null;
-}
+const chain = getOgChainConfig();
 
 export const TREASURY_CONFIG = {
-  ADDRESS: reqEnv('NEXT_PUBLIC_TREASURY_ADDRESS', ['TREASURY_ADDRESS']),
+  ADDRESS:
+    process.env.NEXT_PUBLIC_TREASURY_ADDRESS ||
+    process.env.TREASURY_ADDRESS ||
+    '',
 
-  // Default network (used for display / chain-add when user isn't on either 0G chain yet)
-  NETWORK: OG_MAINNET,
+  NETWORK: {
+    CHAIN_ID: chain.chainIdHex,
+    CHAIN_NAME: chain.name,
+    RPC_URL: chain.rpcUrl,
+    EXPLORER_URL: chain.explorerUrl,
+    CHAIN_ID_DECIMAL: chain.chainId,
+  },
 
   GAS: {
     DEPOSIT_LIMIT: process.env.GAS_LIMIT_DEPOSIT
@@ -47,15 +26,24 @@ export const TREASURY_CONFIG = {
   },
 
   LIMITS: {
-    MIN_DEPOSIT: parseFloat(process.env.MIN_DEPOSIT || '0.001'),
-    MAX_DEPOSIT: parseFloat(process.env.MAX_DEPOSIT || '100'),
+    MIN_DEPOSIT: parseFloat(process.env.MIN_DEPOSIT) || 0.001,
+    MAX_DEPOSIT: parseFloat(process.env.MAX_DEPOSIT) || 100,
   },
 };
 
-export const isValidTreasuryAddress = (address) => /^0x[a-fA-F0-9]{40}$/.test(address);
+export const getTreasuryPrivateKey = () => {
+  if (typeof window !== 'undefined') return '';
+  return process.env.TREASURY_PRIVATE_KEY || '';
+};
 
-export const getTreasuryInfo = () => ({
-  address: TREASURY_CONFIG.ADDRESS,
-  network: TREASURY_CONFIG.NETWORK.CHAIN_NAME,
-  chainId: TREASURY_CONFIG.NETWORK.CHAIN_ID,
-});
+export const isValidTreasuryAddress = (address) => {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+};
+
+export const getTreasuryInfo = () => {
+  return {
+    address: TREASURY_CONFIG.ADDRESS,
+    network: TREASURY_CONFIG.NETWORK.CHAIN_NAME,
+    chainId: TREASURY_CONFIG.NETWORK.CHAIN_ID,
+  };
+};

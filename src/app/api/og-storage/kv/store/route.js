@@ -7,8 +7,8 @@
 import { NextResponse } from 'next/server';
 import { Indexer, Batcher, KvClient } from '@0glabs/0g-ts-sdk';
 import { ethers } from 'ethers';
-import { requireTreasuryPrivateKey } from '@/lib/treasuryPrivate.js';
-import OG_STORAGE_CONFIG from '@/config/ogStorage.js';
+import { getTreasuryPrivateKey } from '@/config/treasury.js';
+import { getCurrentStorageNetworkConfig } from '@/config/ogStorage.js';
 
 // Initialize clients (singletons)
 let indexer = null;
@@ -26,7 +26,7 @@ async function initializeStorage() {
     
     // Initialize provider and signer
     const provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
-    signer = new ethers.Wallet(requireTreasuryPrivateKey(), provider);
+    signer = new ethers.Wallet(getTreasuryPrivateKey(), provider);
     
     // Initialize indexer
     indexer = new Indexer(networkConfig.indexerRpc);

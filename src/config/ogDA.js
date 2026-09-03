@@ -1,46 +1,94 @@
 /**
- * 0G Data Availability Configuration
+ * 0G Data Availability (DA) Configuration
+ * Configuration for 0G DA blob submission and retrieval
  */
 
+// 0G DA Network Configuration
 export const OG_DA_CONFIG = {
-  // 0G DA Network endpoints
-  rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai',
-  storageUrl: process.env.NEXT_PUBLIC_0G_STORAGE_INDEXER || 'https://indexer-storage-turbo.0g.ai',
+  // Testnet configuration
+  testnet: {
+    rpcUrl: process.env.NEXT_PUBLIC_0G_RPC_URL || 'https://evmrpc-testnet.0g.ai',
+    daClientUrl: process.env.NEXT_PUBLIC_0G_DA_CLIENT_URL || 'http://localhost:51001',
+    entranceContract: '0x857C0A28A8634614BB2C96039Cf4a20AFF709Aa9',
+    networkName: '0G Testnet',
+    chainId: 16602,
+  },
   
-  // Network configuration
-  chainId: 16661,
-  networkName: '0G Mainnet',
-  
-  // DA specific settings
-  maxDataSize: 1024 * 1024, // 1MB max
-  timeout: 30000, // 30 seconds
-  retries: 3,
-  
-  // Storage settings
-  storageNodes: [
-    'https://indexer-storage-turbo.0g.ai'
-  ]
+  // Mainnet configuration
+  mainnet: {
+    rpcUrl: process.env.NEXT_PUBLIC_0G_MAINNET_RPC_URL || 'https://evmrpc.0g.ai',
+    daClientUrl: process.env.NEXT_PUBLIC_0G_DA_CLIENT_URL || 'http://localhost:51001',
+    entranceContract: '0x857C0A28A8634614BB2C96039Cf4a20AFF709Aa9', // Update with mainnet address
+    networkName: '0G Mainnet',
+    chainId: 16661,
+  },
 };
 
-// Get current DA network configuration
+// DA Blob Configuration
+export const OG_DA_BLOB_CONFIG = {
+  // Maximum blob size (in bytes)
+  MAX_BLOB_SIZE: 32505852, // ~32 MB
+  
+  // Recommended blob size for batch submissions
+  RECOMMENDED_BATCH_SIZE: 1000000, // ~1 MB
+  
+  // Minimum blob size (in bytes)
+  MIN_BLOB_SIZE: 1,
+  
+  // Timeout for blob submission (in milliseconds)
+  SUBMISSION_TIMEOUT: 60000, // 60 seconds
+  
+  // Retry configuration
+  MAX_RETRIES: 3,
+  RETRY_DELAY: 2000, // 2 seconds
+};
+
+// DA Fee Configuration
+export const OG_DA_FEE_CONFIG = {
+  // Blob price (in OG tokens) - will be fetched from contract
+  BLOB_PRICE: 0, // Dynamic, fetched from DA contract
+  
+  // Estimated gas for submission (in wei)
+  ESTIMATED_GAS: 2000000n,
+};
+
+// Game History DA Configuration
+export const OG_DA_GAME_HISTORY_CONFIG = {
+  // Batch size for game history (number of games per blob)
+  BATCH_SIZE: 100, // 100 games per blob
+  
+  // Enable automatic DA submission for game results
+  AUTO_SUBMIT: true,
+  
+  // Compression enabled
+  COMPRESSION_ENABLED: true,
+};
+
+// Get current network config
 export const getCurrentDANetworkConfig = () => {
-  const network = process.env.NEXT_PUBLIC_NETWORK || process.env.NEXT_PUBLIC_DEFAULT_NETWORK;
-  const isMainnet = network === '0g-mainnet' || network === 'mainnet';
-  
-  return {
-    ...OG_DA_CONFIG,
-    rpcUrl: isMainnet 
-      ? (process.env.NEXT_PUBLIC_0G_MAINNET_RPC || 'https://evmrpc.0g.ai')
-      : (process.env.NEXT_PUBLIC_0G_GALILEO_RPC || 'https://evmrpc-testnet.0g.ai'),
-    chainId: isMainnet ? 16661 : 16602,
-    networkName: isMainnet ? '0G Mainnet' : '0G Testnet'
-  };
+  const isMainnet =
+    process.env.NEXT_PUBLIC_NETWORK === 'MAINNET' ||
+    process.env.NEXT_PUBLIC_NETWORK === '0g-mainnet' ||
+    process.env.NEXT_PUBLIC_0G_CHAIN === 'mainnet';
+  return isMainnet 
+    ? OG_DA_CONFIG.mainnet 
+    : OG_DA_CONFIG.testnet;
 };
 
-// Validate blob size
+// Helper to validate blob size
 export const validateBlobSize = (data) => {
-  const size = typeof data === 'string' ? new Blob([data]).size : data.length;
-  return size <= OG_DA_CONFIG.maxDataSize;
+  const size = typeof data === 'string' 
+    ? new TextEncoder().encode(data).length 
+    : Buffer.isBuffer(data) 
+      ? data.length 
+      : JSON.stringify(data).length;
+  
+  if (size > OG_DA_BLOB_CONFIG.MAX_BLOB_SIZE) {
+    throw new Error(`Blob size ${size} bytes exceeds maximum ${OG_DA_BLOB_CONFIG.MAX_BLOB_SIZE} bytes`);
+  }
+  
+  return size;
 };
 
 export default OG_DA_CONFIG;
+

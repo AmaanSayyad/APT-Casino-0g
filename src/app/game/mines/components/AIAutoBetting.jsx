@@ -21,26 +21,63 @@ const AIAutoBetting = ({ onActivate, isActive, onSettings }) => {
     }
   }, [isActive]);
 
-  // Simulate AI making a decision
+  // Real 0G Compute recommendation when auto-betting is active
   useEffect(() => {
-    if (isActive && !lastAction) {
-      const actions = [
-        { action: 'Analyzing risk patterns...', recommendation: 'Reveal 3 more tiles for optimal return' },
-        { action: 'Calculating win probability...', recommendation: '72.4% chance of safe next move' },
-        { action: 'Evaluating position...', recommendation: 'Current position favorable for +2 reveals' },
-        { action: 'Scanning historical data...', recommendation: 'Similar patterns suggest cashout after next tile' }
-      ];
-      
-      const randomAction = actions[Math.floor(Math.random() * actions.length)];
-      setLastAction(randomAction);
-      
-      const timer = setTimeout(() => {
-        setLastAction(null);
-      }, 8000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isActive, lastAction, aiThinking]);
+    if (!isActive) return undefined;
+
+    let cancelled = false;
+    const run = async () => {
+      setAiThinking(true);
+      try {
+        const response = await fetch('/api/og-compute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'inference',
+            messages: [
+              {
+                role: 'system',
+                content:
+                  'You are an on-chain casino strategy assistant running on 0G Compute. Reply in one short sentence with a Mines next-move recommendation.',
+              },
+              {
+                role: 'user',
+                content: `Mode: ${currentMode}. Recommend the next mines action.`,
+              },
+            ],
+          }),
+        });
+        const data = await response.json();
+        if (!cancelled && data?.success && data.response?.content) {
+          setLastAction({
+            action: '0G Compute inference',
+            recommendation: String(data.response.content).slice(0, 220),
+          });
+          return;
+        }
+      } catch (error) {
+        console.warn('0G Compute recommendation failed:', error);
+      } finally {
+        if (!cancelled) setAiThinking(false);
+      }
+
+      if (!cancelled) {
+        const fallback = [
+          { action: 'Analyzing risk patterns...', recommendation: 'Reveal 3 more tiles for optimal return' },
+          { action: 'Calculating win probability...', recommendation: '72.4% chance of safe next move' },
+          { action: 'Evaluating position...', recommendation: 'Current position favorable for +2 reveals' },
+        ];
+        setLastAction(fallback[Math.floor(Math.random() * fallback.length)]);
+      }
+    };
+
+    run();
+    const interval = setInterval(run, 20000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [isActive, currentMode]);
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
@@ -153,7 +190,7 @@ const AIAutoBetting = ({ onActivate, isActive, onSettings }) => {
                   <div>
                     <div className="flex items-center justify-between text-xs text-white/70 mb-2">
                       <span>Mode: <span className="text-blue-300 font-medium">{currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}</span></span>
-                      <span>Model: <span className="text-blue-300">OG GamingGPT v2</span></span>
+                      <span>Model: <span className="text-blue-300">0G Compute</span></span>
                     </div>
                     <AnimatePresence>
                       {lastAction && (

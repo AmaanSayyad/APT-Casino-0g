@@ -1,56 +1,60 @@
-/**
- * Fund the treasury wallet on 0G EVM (native OG).
- * Requires TREASURY_PRIVATE_KEY. Optional FUNDER_PRIVATE_KEY sends OG when balance is low.
- */
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
-const { ethers } = require('ethers');
+const { AptosAccount, AptosClient, FaucetClient } = require('aptos');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
-const TREASURY_PRIVATE_KEY = process.env.TREASURY_PRIVATE_KEY;
-const OG_RPC =
-  process.env.NEXT_PUBLIC_0G_MAINNET_RPC ||
-  process.env.NEXT_PUBLIC_0G_GALILEO_RPC ||
-  'https://evmrpc.0g.ai';
+const APTOS_NODE_URL = process.env.NEXT_PUBLIC_APTOS_NETWORK === 'mainnet' 
+  ? 'https://fullnode.mainnet.aptoslabs.com/v1'
+  : 'https://fullnode.testnet.aptoslabs.com/v1';
+
+const FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
 
 async function fundTreasury() {
   try {
+    console.log('🏦 Funding Treasury Wallet...');
+    
+    const TREASURY_PRIVATE_KEY = process.env.TREASURY_PRIVATE_KEY;
     if (!TREASURY_PRIVATE_KEY) {
-      console.error('❌ Set TREASURY_PRIVATE_KEY in .env');
-      process.exit(1);
+      throw new Error('TREASURY_PRIVATE_KEY is required');
     }
-
-    console.log('🏦 0G treasury funding check');
-    const provider = new ethers.JsonRpcProvider(OG_RPC);
-    const treasuryWallet = new ethers.Wallet(TREASURY_PRIVATE_KEY, provider);
-    console.log('📍 Treasury:', treasuryWallet.address);
-    console.log('🌐 RPC:', OG_RPC);
-
-    const currentBalance = await provider.getBalance(treasuryWallet.address);
-    const minRequired = ethers.parseEther(process.env.MIN_TREASURY_BALANCE_OG || '0.01');
-    console.log(`💰 Balance: ${ethers.formatEther(currentBalance)} OG`);
-
-    if (currentBalance >= minRequired) {
-      console.log('✅ Treasury already meets minimum balance');
-      return;
+    
+    console.log('🔑 Private key found:', TREASURY_PRIVATE_KEY.slice(0, 10) + '...');
+    
+    // Create treasury account from private key
+    const treasuryAccount = new AptosAccount(
+      new Uint8Array(Buffer.from(TREASURY_PRIVATE_KEY.slice(2), 'hex'))
+    );
+    
+    console.log('📍 Treasury Address:', treasuryAccount.address().hex());
+    
+    const client = new AptosClient(APTOS_NODE_URL);
+    const faucetClient = new FaucetClient(APTOS_NODE_URL, FAUCET_URL);
+    
+    // Check current balance
+    const resources = await client.getAccountResources(treasuryAccount.address());
+    const aptCoinResource = resources.find(r => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>");
+    const currentBalance = aptCoinResource ? parseInt(aptCoinResource.data.coin.value) : 0;
+    
+    console.log('💰 Current Balance:', (currentBalance / 100000000).toFixed(4), 'APT');
+    
+    if (process.env.NEXT_PUBLIC_APTOS_NETWORK === 'testnet') {
+      // Fund from faucet (testnet only)
+      console.log('🚰 Requesting funds from faucet...');
+      await faucetClient.fundAccount(treasuryAccount.address(), 100000000); // 1 APT
+      
+      // Check new balance
+      const newResources = await client.getAccountResources(treasuryAccount.address());
+      const newAptCoinResource = newResources.find(r => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>");
+      const newBalance = newAptCoinResource ? parseInt(newAptCoinResource.data.coin.value) : 0;
+      
+      console.log('✅ New Balance:', (newBalance / 100000000).toFixed(4), 'APT');
+      console.log('🎉 Treasury funded successfully!');
+    } else {
+      console.log('⚠️  Mainnet detected. Please fund the treasury manually.');
+      console.log('📍 Send APT to:', treasuryAccount.address().hex());
     }
-
-    console.log(`⚠️ Below minimum (${ethers.formatEther(minRequired)} OG). Fund this address manually or set FUNDER_PRIVATE_KEY.`);
-
-    if (process.env.FUNDER_PRIVATE_KEY) {
-      const funder = new ethers.Wallet(process.env.FUNDER_PRIVATE_KEY, provider);
-      const funderBal = await provider.getBalance(funder.address);
-      const shortfall = minRequired - currentBalance;
-      if (funderBal < shortfall + ethers.parseEther('0.001')) {
-        console.error('❌ Funder balance too low');
-        return;
-      }
-      console.log(`📤 Sending ${ethers.formatEther(shortfall)} OG from funder...`);
-      const tx = await funder.sendTransaction({ to: treasuryWallet.address, value: shortfall });
-      await tx.wait();
-      console.log('✅ Funded. TX:', tx.hash);
-    }
-  } catch (e) {
-    console.error('❌ Error:', e.message || e);
-    process.exit(1);
+    
+  } catch (error) {
+    console.error('❌ Error funding treasury:', error);
   }
 }
 

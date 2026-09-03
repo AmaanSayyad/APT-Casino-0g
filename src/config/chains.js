@@ -1,43 +1,56 @@
 /**
  * Custom Chain Definitions
- * Both 0G networks so users can connect from either Mainnet or Galileo Testnet.
+ * Defines custom chains not included in wagmi/chains
  */
 
 import { defineChain } from 'viem';
+import { OG_MAINNET, OG_TESTNET } from './ogNetwork';
 
-// 0G Mainnet (chain ID 16661 / 0x4115)
-export const ogMainnet = defineChain({
-  id: 16661,
-  name: '0G Mainnet',
-  nativeCurrency: { decimals: 18, name: 'OG', symbol: 'OG' },
+// 0G Galileo Testnet Chain Definition
+export const ogGalileo = defineChain({
+  id: OG_TESTNET.chainId,
+  name: OG_TESTNET.name,
+  nativeCurrency: OG_TESTNET.nativeCurrency,
   rpcUrls: {
-    default: { http: ['https://evmrpc.0g.ai'] },
-    public:  { http: ['https://evmrpc.0g.ai'] },
+    default: {
+      http: [OG_TESTNET.rpcUrl],
+    },
+    public: {
+      http: [OG_TESTNET.rpcUrl],
+    },
   },
   blockExplorers: {
-    default: { name: '0G Explorer', url: 'https://chainscan.0g.ai' },
-  },
-  testnet: false,
-});
-
-// 0G Galileo Testnet (chain ID 16602 / 0x40da)
-export const ogGalileoTestnet = defineChain({
-  id: 16602,
-  name: '0G-Galileo-Testnet',
-  nativeCurrency: { decimals: 18, name: 'OG', symbol: '0G' },
-  rpcUrls: {
-    default: { http: ['https://evmrpc-testnet.0g.ai'] },
-    public:  { http: ['https://evmrpc-testnet.0g.ai'] },
-  },
-  blockExplorers: {
-    default: { name: '0G Galileo Explorer', url: 'https://chainscan-galileo.0g.ai' },
+    default: {
+      name: '0G Galileo Explorer',
+      url: OG_TESTNET.explorerUrl,
+    },
   },
   testnet: true,
 });
 
-// Legacy alias kept so existing imports of `ogGalileo` don't break
-export const ogGalileo = ogMainnet;
+// 0G Mainnet (Aristotle) — Wave 3 required chain
+export const ogMainnet = defineChain({
+  id: OG_MAINNET.chainId,
+  name: OG_MAINNET.name,
+  nativeCurrency: OG_MAINNET.nativeCurrency,
+  rpcUrls: {
+    default: {
+      http: [OG_MAINNET.rpcUrl],
+    },
+    public: {
+      http: [OG_MAINNET.rpcUrl],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: '0G Chain Explorer',
+      url: OG_MAINNET.explorerUrl,
+    },
+  },
+  testnet: false,
+});
 
-export const OG_SUPPORTED_CHAIN_IDS = [ogMainnet.id, ogGalileoTestnet.id]; // [16661, 16602]
-
-export default { ogMainnet, ogGalileoTestnet, ogGalileo };
+export default {
+  ogGalileo,
+  ogMainnet,
+};
