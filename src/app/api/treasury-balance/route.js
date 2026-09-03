@@ -36,7 +36,7 @@ export async function GET() {
           balance: ogBalanceInOg,
           balanceWei: ogBalance.toString(),
           network: TREASURY_CONFIG.NETWORK.CHAIN_NAME,
-          chainId: TREASURY_CONFIG.NETWORK.CHAIN_ID_DECIMAL,
+          chainId: TREASURY_CONFIG.NETWORK.CHAIN_ID,
           rpcUrl: ogRpcUrl
         },
         arbitrumSepolia: {
