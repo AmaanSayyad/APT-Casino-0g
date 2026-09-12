@@ -27,7 +27,9 @@ export async function GET() {
     project: {
       name: 'APT-Casino',
       oneLiner: 'Provably fair GameFi casino on 0G Mainnet with Compute, Storage, and DA.',
-      liveUrl: 'https://apt-casino-0g-gamma.vercel.app',
+      liveUrl:
+        process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ||
+        'https://apt-casino-0g-production.up.railway.app',
       demoVideo: 'https://youtu.be/1QGwBnbokOw',
     },
     chain: {

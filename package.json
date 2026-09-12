@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --hostname 0.0.0.0 --port ${PORT:-3000}",
     "lint": "next lint",
     "fund-treasury": "node scripts/fund-treasury.js",
     "deploy:move": "node move-contracts/scripts/deploy.js --network=testnet",

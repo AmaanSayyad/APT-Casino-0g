@@ -6,8 +6,8 @@ Complete architecture diagram showing how all 0G services are integrated into th
 
 | Resource | Link |
 |---|---|
-| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
-| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Live app | [https://apt-casino-0g-production.up.railway.app](https://apt-casino-0g-production.up.railway.app) |
+| Wave 3 proof | [https://apt-casino-0g-production.up.railway.app/0g](https://apt-casino-0g-production.up.railway.app/0g) |
 | Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 | GameLogger | [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3) |
 

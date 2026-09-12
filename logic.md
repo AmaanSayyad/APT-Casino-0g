@@ -4,8 +4,8 @@
 
 | Resource | Link |
 |---|---|
-| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
-| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
+| Live app | [https://apt-casino-0g-production.up.railway.app](https://apt-casino-0g-production.up.railway.app) |
+| Wave 3 proof | [https://apt-casino-0g-production.up.railway.app/0g](https://apt-casino-0g-production.up.railway.app/0g) |
 | Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 
 ## Overview

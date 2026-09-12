@@ -33,8 +33,9 @@ Thumbs.db
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# Vercel
+# Vercel / Railway local link state
 .vercel
+.railway
 
 # TypeScript
 *.tsbuildinfo

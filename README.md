@@ -4,9 +4,9 @@
 
 | Resource | Link |
 |---|---|
-| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
-| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
-| Proof API | [https://apt-casino-0g-gamma.vercel.app/api/wave3-proof](https://apt-casino-0g-gamma.vercel.app/api/wave3-proof) |
+| Live app | [https://apt-casino-0g-production.up.railway.app](https://apt-casino-0g-production.up.railway.app) |
+| Wave 3 proof | [https://apt-casino-0g-production.up.railway.app/0g](https://apt-casino-0g-production.up.railway.app/0g) |
+| Proof API | [https://apt-casino-0g-production.up.railway.app/api/wave3-proof](https://apt-casino-0g-production.up.railway.app/api/wave3-proof) |
 | Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 | GitHub | [https://github.com/AmaanSayyad/APT-Casino-0g](https://github.com/AmaanSayyad/APT-Casino-0g) |
 | GameLogger (mainnet) | [`0xac13628e37628E8e8d9238F1564841cf220742a3`](https://chainscan.0g.ai/address/0xac13628e37628E8e8d9238F1564841cf220742a3) |
@@ -257,9 +257,9 @@ sequenceDiagram
 
 | Resource | Link |
 |---|---|
-| Live app | [https://apt-casino-0g-gamma.vercel.app](https://apt-casino-0g-gamma.vercel.app) |
-| Wave 3 proof | [https://apt-casino-0g-gamma.vercel.app/0g](https://apt-casino-0g-gamma.vercel.app/0g) |
-| Proof API | [https://apt-casino-0g-gamma.vercel.app/api/wave3-proof](https://apt-casino-0g-gamma.vercel.app/api/wave3-proof) |
+| Live app | [https://apt-casino-0g-production.up.railway.app](https://apt-casino-0g-production.up.railway.app) |
+| Wave 3 proof | [https://apt-casino-0g-production.up.railway.app/0g](https://apt-casino-0g-production.up.railway.app/0g) |
+| Proof API | [https://apt-casino-0g-production.up.railway.app/api/wave3-proof](https://apt-casino-0g-production.up.railway.app/api/wave3-proof) |
 | Demo video | [https://youtu.be/1QGwBnbokOw](https://youtu.be/1QGwBnbokOw) |
 | GitHub | [https://github.com/AmaanSayyad/APT-Casino-0g](https://github.com/AmaanSayyad/APT-Casino-0g) |
 | Pitch / slides | [Figma deck](https://www.figma.com/deck/fJ9n6m8yrxu8ULDJXUp5sC/APT-Casino-Push--Copy-?node-id=1-1812&p=f&t=nCxzTlwH2TXsD5ku-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1) |
